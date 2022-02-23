@@ -26,10 +26,6 @@ Serial.println(pin1);
 
 //
 standStill();
-delay(3000);
-turnLeft();
-delay(340);
-standStill();
   
 
 }
