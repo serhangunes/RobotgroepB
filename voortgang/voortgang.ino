@@ -6,8 +6,8 @@ int motorPinRA = 16; //Rechterwiel achteruit
 int motorPinRV = 17; //Rechterwiel vooruit
 int motorPinLV = 5; //Linkerwiel vooruit
 int motorPinLA = 18; //Linkerwiel achteruit
-//int analogPin1 = 39;//
-//int analogPin2 = 34;//
+int analogPin1 = 39;//
+int analogPin2 = 34;//
 int pin1 = 0;
 
 void setup() {
@@ -21,7 +21,7 @@ void setup() {
 void loop(){
 
 //aflezen
-pin1 = analogRead(12);
+pin1 = analogRead(analogPin2);
 Serial.println(pin1);
 
 //
@@ -53,10 +53,22 @@ void driveForward() {
   analogWrite(motorPinLV, 254);
   analogWrite(motorPinLA, 0);
 }
+/*
+ * Turn 90 degrees left
+ */
 
 void turnLeft() {
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, 233);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
+  delay(340);
+}
+
+void turnRight()  {
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, 254);
+  analogWrite(motorPinLA, 0);
+  delay(380);
 }
