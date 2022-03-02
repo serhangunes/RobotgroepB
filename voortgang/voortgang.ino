@@ -11,9 +11,6 @@ int IRPinL = 34;//
 int pinR = 0;
 int pinL = 0;
 
-int a;
-int b;
-
 void setup() {
   Serial.begin(9600);
   pinMode(motorPinRA, OUTPUT);
@@ -45,10 +42,15 @@ else if(pinR == 1 && pinL == 0)
 }
 else if(pinR == 0 && pinL == 0)
 {
-//  delay(500);
-  turnRight90();
-}
+standStill();
+delay(1000);
+driveBackwards();
+delay(500);
+//turnRight();
+//delay(250);
 
+
+}
 }
 
 /*
@@ -80,24 +82,40 @@ void driveForward() {
 
 void turnLeft() {
   analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 178);
+  analogWrite(motorPinRV, 175);
   analogWrite(motorPinLV, 0);
-  analogWrite(motorPinLA, 203);
+  analogWrite(motorPinLA, 192);
 //  delay(340);
 }
 
 void turnRight()  {
-  analogWrite(motorPinRA, 178);
+  analogWrite(motorPinRA, 175);
   analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, 203);
+  analogWrite(motorPinLV, 192);
   analogWrite(motorPinLA, 0);
 }
 
 void turnRight90(){
-  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRA, 187);
   analogWrite(motorPinRV, 0);
   analogWrite(motorPinLV, 203);
   analogWrite(motorPinLA, 0);
-  delay(554);
+  delay(350);
   standStill();
+}
+
+void turn180(){
+  analogWrite(motorPinRA, 187);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, 203);
+  analogWrite(motorPinLA, 0);
+  delay(553);
+  standStill();
+}
+
+void driveBackwards(){
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, 234);
+  analogWrite(motorPinLV, 254);
+  analogWrite(motorPinLA, 0);
 }
