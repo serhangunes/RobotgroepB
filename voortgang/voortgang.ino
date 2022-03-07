@@ -45,7 +45,7 @@ else if(pinR == 0 && pinL == 0)
 standStill();
 delay(1000);
 driveBackwards();
-delay(500);
+delay(100);
 //turnRight();
 //delay(250);
 
