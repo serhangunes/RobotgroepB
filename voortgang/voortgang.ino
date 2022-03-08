@@ -2,14 +2,12 @@
 #include <analogWrite.h>
 #include <Adafruit_VL53L0X.h>
 
-int motorPinRA = 16; //Rechterwiel achteruit
-int motorPinRV = 17; //Rechterwiel vooruit
-int motorPinLV = 5; //Linkerwiel vooruit
-int motorPinLA = 18; //Linkerwiel achteruit
-int IRPinR = 39;//
-int IRPinL = 34;//
-int pinR = 0;
-int pinL = 0;
+int motorPinLA = 16; //Rechterwiel achteruit
+int motorPinLV = 17; //Rechterwiel vooruit
+int motorPinRV = 5; //Linkerwiel vooruit
+int motorPinRA = 18; //Linkerwiel achteruit
+int IRPinR = 39;// IR pin rechts
+int IRPinL = 34;// IR pin links
 
 void setup() {
   Serial.begin(9600);
@@ -19,38 +17,41 @@ void setup() {
   pinMode(motorPinLA, OUTPUT);
 }
 
-void loop(){
-
-//aflezen pin rechts
-pinL = analogRead(IRPinL)/2600;
-//Serial.println(pinL);
-
-//aflezen pin links
-pinR = analogRead(IRPinR)/2600;
-//Serial.println(pinR);
-
-if(pinR == 1 && pinL ==1)
-{
-  driveForward();
-}else if(pinR == 0 && pinL == 1)
-{
-  turnRight();
-}
-else if(pinR == 1 && pinL == 0)
-{
-  turnLeft();
-}
-else if(pinR == 0 && pinL == 0)
-{
-standStill();
-delay(1000);
-driveBackwards();
-delay(100);
-//turnRight();
-//delay(250);
-
-
-}
+void loop(){  
+  //aflezen pin rechts
+  int pinL = analogRead(IRPinL)/2600;
+  //Serial.println(pinL);
+  
+  //aflezen pin links
+  int pinR = analogRead(IRPinR)/2600;
+  //Serial.println(pinR);
+  
+  driveForward(100, 3000);
+  standStill();
+  delay(1000);
+  
+  //if(pinR == 1 && pinL ==1)
+  //{
+  //  driveForward();
+  //}else if(pinR == 0 && pinL == 1)
+  //{
+  //  turnRight();
+  //}
+  //else if(pinR == 1 && pinL == 0)
+  //{
+  //  turnLeft();
+  //}
+  //else if(pinR == 0 && pinL == 0)
+  //{
+  //standStill();
+  //delay(1000);
+  //driveBackwards();
+  //delay(100);
+  ////turnRight();
+  ////delay(250);
+  //
+  //
+//}
 }
 
 /*
@@ -70,12 +71,17 @@ void standStill() {
 /*
  * Drive Forward
  */
-void driveForward() {
-  analogWrite(motorPinRA, 178);
+void driveForward(double percentage, int duration) {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((210.0f / 100.0f) * percentage);
+  
+  analogWrite(motorPinRA, speedR);
   analogWrite(motorPinRV, 0);
   analogWrite(motorPinLV, 0);
-  analogWrite(motorPinLA, 203);
+  analogWrite(motorPinLA, speedL);
+  delay(duration);
 }
+
 /*
  * Turn 90 degrees left
  */
