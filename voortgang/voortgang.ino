@@ -26,7 +26,7 @@ void loop(){
   int pinR = analogRead(IRPinR)/2600;
   //Serial.println(pinR);
   
-  driveForward(100, 3000);
+  driveForward(70, 3000);
   standStill();
   delay(1000);
   
@@ -73,7 +73,7 @@ void standStill() {
  */
 void driveForward(double percentage, int duration) {
   int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((210.0f / 100.0f) * percentage);
+  int speedL = int((225.0f / 100.0f) * percentage);
   
   analogWrite(motorPinRA, speedR);
   analogWrite(motorPinRV, 0);
