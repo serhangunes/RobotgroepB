@@ -14,11 +14,11 @@ int IRPinL = 34;//
 int pinR = 0;
 int pinL = 0;
 
-int colorThreshold = 2000;
+int colorThreshold = 1100;
 
 Adafruit_SSD1306 display(128, 32, &Wire, 4);
 
-Adafruit_VL53L0X lox = Adafruit_VL53L0X();
+//Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
 void setup() {
 
@@ -26,10 +26,10 @@ void setup() {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
-  if (!lox.begin()) {
-    Serial.println(F("Failed to boot VL53L0X"));
-    while(1);
-  }
+//  if (!lox.begin()) {
+//    Serial.println(F("Failed to boot VL53L0X"));
+//    while(1);
+//  }
   
   display.clearDisplay();
   display.setTextSize(1);
@@ -46,12 +46,13 @@ void setup() {
 }
 
 void loop() {
-  VL53L0X_RangingMeasurementData_t measure;
-  lox.rangingTest(&measure, false);
-
-  if(measure.RangeMilliMeter < 50) {
-    standStill();
-  }
+//  VL53L0X_RangingMeasurementData_t measure;
+//  lox.rangingTest(&measure, false);
+//
+////  if(measure.RangeMilliMeter < 50) {
+////    standStill();
+////  }
+//  Serial.print("Distance (mm): ");
 
   // put your main code here, to run repeatedly:
   //aflezen pin rechts
@@ -70,31 +71,31 @@ void loop() {
   display.println(analogRead(IRPinR));
   display.display();
 
-Serial.print(" ");
-//aflezen pin links
-
-
-/*
- * lijn tussen sensoren
- */
-
-// standStill();
-if(pinR >= colorThreshold && pinL >= colorThreshold)
-{
-  standStill();
-}
-else if(pinR < colorThreshold && pinL >= colorThreshold)
-{
-  turnRight(70);
-}
-else if(pinR >= colorThreshold && pinL < colorThreshold)
-{
-  turnLeft(70);
-}
-else if(pinR < colorThreshold && pinL <colorThreshold)
-{
-  driveForward(70);
-}
+  //Serial.print(" ");
+  //aflezen pin links
+  
+  
+  /*
+   * lijn tussen sensoren
+   */
+  
+  // standStill();
+  if(pinR >= colorThreshold && pinL >= colorThreshold)
+  {
+    standStill();
+  }
+  else if(pinR < colorThreshold && pinL >= colorThreshold)
+  {
+    turnRight(100);
+  }
+  else if(pinR >= colorThreshold && pinL < colorThreshold)
+  {
+    turnLeft(100);
+  }
+  else if(pinR < colorThreshold && pinL <colorThreshold)
+  {
+    driveForward(100);
+  }
 }
 
 /*
@@ -122,6 +123,17 @@ void driveForward(double percentage) {
   analogWrite(motorPinRV, 0);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, speedL);
+}
+
+void driveForwardFor(double percentage, int duration) {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((225.0f / 100.0f) * percentage);
+  
+  analogWrite(motorPinRA, speedR);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, 0);
+  analogWrite(motorPinLA, speedL);
+  delay(duration);
 }
 /*
  * Turn 90 degrees left
