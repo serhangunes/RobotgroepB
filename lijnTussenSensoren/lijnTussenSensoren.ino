@@ -2,8 +2,8 @@
 #include <analogWrite.h>
 #include <Adafruit_VL53L0X.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include "Adafruit_VL53L0X.h"
+#include <Adafruit_SSD1306.h>  
+#include "WiFi.h"
 
 int motorPinLA = 16; //Rechterwiel achteruit
 int motorPinLV = 17; //Rechterwiel vooruit
@@ -14,11 +14,16 @@ int IRPinL = 34;//
 int pinR = 0;
 int pinL = 0;
 
+const char* ssid = "";
+const char* password = "";
+
 int colorThreshold = 1100;
+
+
 
 Adafruit_SSD1306 display(128, 32, &Wire, 4);
 
-//Adafruit_VL53L0X lox = Adafruit_VL53L0X();
+Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
 void setup() {
 
@@ -26,35 +31,38 @@ void setup() {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
-//  if (!lox.begin()) {
-//    Serial.println(F("Failed to boot VL53L0X"));
-//    while(1);
-//  }
+  if (!lox.begin()) {
+    Serial.println(F("Failed to boot VL53L0X"));
+    while(1);
+  }
   
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
   display.display();
   
-  // put your setup code here, to run once:
-  Serial.begin(9600);
+  Serial.begin(115200);
   pinMode(motorPinRA, OUTPUT);
   pinMode(motorPinRV, OUTPUT);
   pinMode(motorPinLV, OUTPUT);
   pinMode(motorPinLA, OUTPUT);
 
+  Serial.begin(115200);
+ 
+  WiFi.begin(ssid, password);
+ 
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.println("Connecting to WiFi..");
+  }
+ 
+  Serial.println("Connected to the WiFi network");
 }
 
 void loop() {
-//  VL53L0X_RangingMeasurementData_t measure;
-//  lox.rangingTest(&measure, false);
-//
-////  if(measure.RangeMilliMeter < 50) {
-////    standStill();
-////  }
-//  Serial.print("Distance (mm): ");
+  VL53L0X_RangingMeasurementData_t measure;
+  lox.rangingTest(&measure, false);
 
-  // put your main code here, to run repeatedly:
   //aflezen pin rechts
   pinL = analogRead(IRPinL);
   //Serial.print(pinL);
@@ -69,6 +77,8 @@ void loop() {
   display.println(analogRead(IRPinL));
   display.print("PinR: ");
   display.println(analogRead(IRPinR));
+  display.print("Dist: ");
+  display.println(measure.RangeMilliMeter);
   display.display();
 
   //Serial.print(" ");
@@ -80,21 +90,25 @@ void loop() {
    */
   
   // standStill();
-  if(pinR >= colorThreshold && pinL >= colorThreshold)
-  {
+  if(measure.RangeMilliMeter > 300) {
+    if(pinR >= colorThreshold && pinL >= colorThreshold)
+    {
+      standStill();
+    }
+    else if(pinR < colorThreshold && pinL >= colorThreshold)
+    {
+      turnRight(100);
+    }
+    else if(pinR >= colorThreshold && pinL < colorThreshold)
+    {
+      turnLeft(100);
+    }
+    else if(pinR < colorThreshold && pinL <colorThreshold)
+    {
+      driveForward(100);
+    }
+  } else {
     standStill();
-  }
-  else if(pinR < colorThreshold && pinL >= colorThreshold)
-  {
-    turnRight(100);
-  }
-  else if(pinR >= colorThreshold && pinL < colorThreshold)
-  {
-    turnLeft(100);
-  }
-  else if(pinR < colorThreshold && pinL <colorThreshold)
-  {
-    driveForward(100);
   }
 }
 
