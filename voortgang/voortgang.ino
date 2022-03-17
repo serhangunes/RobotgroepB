@@ -83,7 +83,7 @@ void driveForward(double percentage, int duration) {
 }
 
 /*
- * Turn 90 degrees left
+ * Turn degrees left
  */
 
 void turnLeft() {
