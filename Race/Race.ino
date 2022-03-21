@@ -51,22 +51,23 @@ void loop(){
   int pinL = analogRead(IRPinL)/1100;
   int pinR = analogRead(IRPinR)/1100;
 
+standStill();
   //if robot sees black with bothstand still
-  if(pinL >= 1 && pinR >= 1){
-    standStill();
-    delay(500);
-    driveBackwards();
-    delay(500);
-    //if robot sees black on the right then drive left
-  }else if(pinL == 0 && pinR >= 1){
-    turnLeft(80);
-    //if robot sees black on the left then drive right
-  }else if(pinL >= 1 && pinR == 0){
-    turnRight(80);
-    //if the robot sees no black then drive forward
-  }else if(pinL == 0 && pinR == 0){
-    driveForward(80);
-  }
+//  if(pinL >= 1 && pinR >= 1){
+//    standStill();
+//    delay(500);
+//    driveBackwards();
+//    delay(500);
+//    //if robot sees black on the right then drive left
+//  }else if(pinL == 0 && pinR >= 1){
+//    turnLeft(80);
+//    //if robot sees black on the left then drive right
+//  }else if(pinL >= 1 && pinR == 0){
+//    turnRight(80);
+//    //if the robot sees no black then drive forward
+//  }else if(pinL == 0 && pinR == 0){
+//    driveForward(80);
+//  }
 }
 
 /*
@@ -130,10 +131,8 @@ void standStill() {
  * drive backwards
  */
 void driveBackwards(){
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((225.0f / 100.0f) * percentage);
   analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, speedR);
-  analogWrite(motorPinLV, speedL);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
 }

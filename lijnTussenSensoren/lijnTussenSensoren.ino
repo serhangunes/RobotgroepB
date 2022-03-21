@@ -37,7 +37,7 @@ void setup() {
   }
   
   display.clearDisplay();
-  display.setTextSize(1);
+  display.setTextSize(2);
   display.setTextColor(SSD1306_WHITE);
   display.display();
   
@@ -84,32 +84,33 @@ void loop() {
   //Serial.print(" ");
   //aflezen pin links
   
-  
+
+  standStill();
   /*
    * lijn tussen sensoren
    */
   
-  // standStill();
-  if(measure.RangeMilliMeter > 300) {
-    if(pinR >= colorThreshold && pinL >= colorThreshold)
-    {
-      standStill();
-    }
-    else if(pinR < colorThreshold && pinL >= colorThreshold)
-    {
-      turnRight(100);
-    }
-    else if(pinR >= colorThreshold && pinL < colorThreshold)
-    {
-      turnLeft(100);
-    }
-    else if(pinR < colorThreshold && pinL <colorThreshold)
-    {
-      driveForward(100);
-    }
-  } else {
-    standStill();
-  }
+//  // standStill();
+//  if(measure.RangeMilliMeter > 300) {
+//    if(pinR >= colorThreshold && pinL >= colorThreshold)
+//    {
+//      standStill();
+//    }
+//    else if(pinR < colorThreshold && pinL >= colorThreshold)
+//    {
+//      turnRight(100);
+//    }
+//    else if(pinR >= colorThreshold && pinL < colorThreshold)
+//    {
+//      turnLeft(100);
+//    }
+//    else if(pinR < colorThreshold && pinL <colorThreshold)
+//    {
+//      driveForward(100);
+//    }
+//  } else {
+//    standStill();
+//  }
 }
 
 /*
