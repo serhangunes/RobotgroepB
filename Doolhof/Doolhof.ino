@@ -87,39 +87,39 @@ pinR = analogRead(IRPinR);
  * maze
  */
 standStill();
-// if(pinL < white && pinR < white)  {
-//  driveForward(70);
-// }else if(pinL < white && pinR > white && pinR < black) {
-//  turnRight(70);
-// }else if(pinL < white && pinR > black)  {
-//  turnRight90();
-//  standStill();
-//  if(pinL > black && pinR > black)  {
-//    turn90Backwards();
-//    driveForward(70);
-//  }else if(pinL < black && pinR > black)  {
-//    driveForward(70);
-//  }
-// }else if(pinL > white && pinL < black && pinR < white) {
-//  turnLeft(70);
-// }else if(pinL > white && pinL < black && pinR > white && pinR < black) {
-//  turn180();
-// }else if(pinL > white && pinL < black && pinR > black) {
-//  turnRight90();
-//  standStill();
-//  if(pinL > black && pinR > black)  {
-//    turn90Backwards();
-//    driveForward(70);
-//  }else if(pinL < black && pinR > black)  {
-//    driveForward(70);
-//  }
-// }else if(pinL > black && pinR < white) {
-//  turnLeft90();
-// }else if(pinL > black && pinR > white && pinR < black) {
-//  turnLeft90();
-// }else if(pinL > black && pinR > black) {
-//  turnLeft90();
-// }
+ if(pinL < white && pinR < white)  {
+  driveForward(70);
+ }else if(pinL < white && pinR > white && pinR < black) {
+  turnRight(70);
+ }else if(pinL < white && pinR > black)  {
+  turnRight90();
+  standStill();
+  if(pinL > black && pinR > black)  {
+    turn90Backwards();
+    driveForward(70);
+  }else if(pinL < black && pinR > black)  {
+    driveForward(70);
+  }
+ }else if(pinL > white && pinL < black && pinR < white) {
+  turnLeft(70);
+ }else if(pinL > white && pinL < black && pinR > white && pinR < black) {
+  turn180();
+ }else if(pinL > white && pinL < black && pinR > black) {
+  turnRight90();
+  standStill();
+  if(pinL > black && pinR > black)  {
+    turn90Backwards();
+    driveForward(70);
+  }else if(pinL < black && pinR > black)  {
+    driveForward(70);
+  }
+ }else if(pinL > black && pinR < white) {
+  turnLeft90();
+ }else if(pinL > black && pinR > white && pinR < black) {
+  turnLeft90();
+ }else if(pinL > black && pinR > black) {
+  turnLeft90();
+ }
 
 
 
