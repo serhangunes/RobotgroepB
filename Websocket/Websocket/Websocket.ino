@@ -1,50 +1,68 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <WiFiMulti.h>
-#include <WiFiClientSecure.h>
 #include <WebSocketsClient.h>
 
-WiFiMulti WiFiMulti;
 WebSocketsClient webSocket;
-#define USE_SERIAL Serial1
 
-const char* ssid = "Hotspot van Yannieck"; //Naam van het netwerk
-const char* password =  "vmzm9931"; //Wachtwoord van het netwerk
-const char* ipadress = "192.168.0.123";
-const int port = 81;
- 
+const char* ssid = "Wifi is saai"; //Naam van het netwerk
+const char* password =  "2much4u2day"; //Wachtwoord van het netwerk
+const char* ipadress = "192.168.210.155";
+const int port = 3003;
+
+int currentLine = 0;
+
 void setup() {
- 
   Serial.begin(115200);
-  // USE_SERIAL.begin(921600);
-  //USE_SERIAL.begin(115200);
-
-  //Serial.setDebugOutput(true);
-  //USE_SERIAL.setDebugOutput(true);
-
-  Serial.println();
-  Serial.println();
-  Serial.println();
-
-  for(uint8_t t = 4; t > 0; t--) {
-    Serial.printf("[SETUP] BOOT WAIT %d...\n", t);
-    Serial.flush();
-    delay(1000);
+  WiFi.begin(ssid, password);
+ 
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.println("Connecting to WiFi..");
   }
-
-  WiFiMulti.addAP(ssid, password);
-
-  //WiFi.disconnect();
-  while(WiFiMulti.run() != WL_CONNECTED) {
-    delay(100);
-  }
+ 
+  Serial.println("Connected to the WiFi network");
 
   // server address, port and URL
   webSocket.begin(ipadress, port, "/");
-  
+
+  // event handler
+  webSocket.onEvent(webSocketEvent);
+
+  // try ever 5000 again if connection has failed
   webSocket.setReconnectInterval(5000);
 }
  
 void loop() {
   webSocket.loop();
+  webSocket.sendTXT("Robot van groep B is verbonden!");
+}
+
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+
+  switch(type) {
+    case WStype_CONNECTED:
+      //Wanneer er verbonden is met de websocket:
+      Serial.print("[WSc] Connected!\n");
+      webSocket.sendTXT("Robot van groep B is verbonden!");
+      break;
+    case WStype_DISCONNECTED:
+      //Wanneer de verbinding met de websocket weg is
+      Serial.println("[WSc] Disconnected!\n");
+      break;    
+    case WStype_TEXT:
+      //Wanneer je iets ontvangt
+      Serial.printf("[WSc] get text: %s\n", payload);
+
+      // send message to server
+      // webSocket.sendTXT("message here");
+      break;
+    case WStype_BIN:
+    case WStype_ERROR:      
+    case WStype_FRAGMENT_TEXT_START:
+    case WStype_FRAGMENT_BIN_START:
+    case WStype_FRAGMENT:
+    case WStype_FRAGMENT_FIN:
+      break;
+  }
+
 }
