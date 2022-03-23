@@ -8,19 +8,19 @@
 
 
 //declaring the pins
-int motorPinLA = 16;
-int motorPinLV = 17;
+int motorPinLV = 16;
+int motorPinLA = 17;
 int motorPinRA = 18;
 int motorPinRV = 5;
-int IRPinR = 39;
-int IRPinL = 34;
+int IRPinL = 39;
+int IRPinR = 34;
 
 //declaring the variables
 int pinR;
 int pinL;
-int grey = 100;
-int black = 1800;
-int white = 40;
+int grey = 120;
+int black = 1100;
+int white = 75;
 
 Adafruit_SSD1306 display(128, 32, &Wire, 4);
 
@@ -49,6 +49,7 @@ if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
   display.display();
 
 //setup pins
+  Serial.begin(115200);
   pinMode(motorPinRA, OUTPUT);
   pinMode(motorPinRV, OUTPUT);
   pinMode(motorPinLV, OUTPUT);
@@ -86,41 +87,73 @@ pinR = analogRead(IRPinR);
 /*
  * maze
  */
-standStill();
- if(pinL < white && pinR < white)  {
-  driveForward(70);
- }else if(pinL < white && pinR > white && pinR < black) {
-  turnRight(70);
- }else if(pinL < white && pinR > black)  {
-  turnRight90();
-  standStill();
-  if(pinL > black && pinR > black)  {
-    turn90Backwards();
-    driveForward(70);
-  }else if(pinL < black && pinR > black)  {
-    driveForward(70);
-  }
- }else if(pinL > white && pinL < black && pinR < white) {
-  turnLeft(70);
- }else if(pinL > white && pinL < black && pinR > white && pinR < black) {
-  turn180();
- }else if(pinL > white && pinL < black && pinR > black) {
-  turnRight90();
-  standStill();
-  if(pinL > black && pinR > black)  {
-    turn90Backwards();
-    driveForward(70);
-  }else if(pinL < black && pinR > black)  {
-    driveForward(70);
-  }
- }else if(pinL > black && pinR < white) {
-  turnLeft90();
- }else if(pinL > black && pinR > white && pinR < black) {
-  turnLeft90();
- }else if(pinL > black && pinR > black) {
-  turnLeft90();
- }
+ standStill();
 
+//if(pinL < white && pinR < white){
+//    driveForward(100);
+//}else if(pinL > white && pinL < grey && pinR < white){
+//    turnLeft(100);
+//}else if(pinL < white && pinR > white && pinR < grey) {
+//  turnRight(100);
+//}else{
+//  standStill();
+//}
+// if(pinL < white && pinR < white)  
+// {
+//    driveForward(70);
+// }
+// else if(pinL < white && pinR > white && pinR < black) 
+// {
+//    turnRight(70);
+// }
+// else if(pinL < white && pinR > black)  
+// {
+//    turnRight90();
+//    standStill();
+//    if(pinL > black && pinR > black)  
+//    {
+//        turn90Backwards();
+//        driveForward(70);
+//    }
+//    else if(pinL < black && pinR > black)  
+//    {
+//        driveForward(70);
+//    }
+// }
+// else if(pinL > white && pinL < black && pinR < white) 
+// {
+//    turnLeft(70);
+// }
+// else if(pinL > white && pinL < black && pinR > white && pinR < black) 
+// {
+//    turn180();
+// }
+// else if(pinL > white && pinL < black && pinR > black) 
+// {
+//    turnRight90();
+//    standStill();
+//    if(pinL > black && pinR > black)  
+//    {
+//      turn90Backwards();
+//      driveForward(70);
+//    }
+//    else if(pinL < black && pinR > black)  
+//    {
+//      driveForward(70);
+//    }
+// }
+// else if(pinL > black && pinR < white) 
+// {
+//    turnLeft90();
+// }
+// else if(pinL > black && pinR > white && pinR < black) 
+// {
+//    turnLeft90();
+// }
+// else if(pinL > black && pinR > black) 
+// {
+//    turnLeft90();
+// }
 
 
  
@@ -137,13 +170,13 @@ standStill();
   */
 
 void driveForward(double percentage)  {
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((225.0f / 100.0f) * percentage);
+  int speedR = int((170.0f / 100.0f) * percentage);
+  int speedL = int((170.0f / 100.0f) * percentage);
   
-  analogWrite(motorPinRA, speedR);
-  analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, 0);
-  analogWrite(motorPinLA, speedL);
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, speedR);
+  analogWrite(motorPinLV, speedL);
+  analogWrite(motorPinLA, 0);
 }
 
 /*
@@ -165,8 +198,8 @@ void turnLeft(double percentage) {
   int speedR = int((255.0f / 100.0f) * percentage);
   int speedL = int((225.0f / 100.0f) * percentage);
   
-  analogWrite(motorPinRA, speedR);
-  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, 200);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
 }
@@ -181,8 +214,8 @@ void turnRight(double percentage) {
   
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, 0);
-  analogWrite(motorPinLA, speedL);
+  analogWrite(motorPinLV, 200);
+  analogWrite(motorPinLA, 0);
 }
 
 /*
@@ -191,10 +224,10 @@ void turnRight(double percentage) {
 
 void turnLeft90() {
   analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinRV, 170);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
-  delay(0);
+  delay(500);
 }
 
 /*
@@ -205,8 +238,8 @@ void turnRight90()  {
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, 0);
   analogWrite(motorPinLV, 0);
-  analogWrite(motorPinLA, 0);
-  delay(0);
+  analogWrite(motorPinLA, 170);
+  delay(500);
 }
 
 /*
@@ -218,8 +251,8 @@ void driveBackwards(double percentage){
   int speedL = int((225.0f / 100.0f) * percentage);
   
   analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, 0);
+  analogWrite(motorPinRV, speedR);
+  analogWrite(motorPinLV, speedL);
   analogWrite(motorPinLA, 0);
 }
 
@@ -228,11 +261,11 @@ void driveBackwards(double percentage){
  */
 
 void turn180()  {
-  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRA, 255);
   analogWrite(motorPinRV, 0);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
-  delay(0);
+  delay(1000);
 }
 
 /*
@@ -240,8 +273,8 @@ void turn180()  {
  */
 void turn90Backwards()  {
   analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinRV, 255);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
-  delay(0);
+  delay(500);
 }
