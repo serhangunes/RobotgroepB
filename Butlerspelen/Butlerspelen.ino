@@ -15,11 +15,11 @@ Adafruit_VL53L0X lidar = Adafruit_VL53L0X();
 void setup() {
   Serial.begin(115200);
   if (!lidar.begin()) {
-    Serial.println(F("Failed to boot VL53L0X"));
+    Serial.println(F("Failed to connect to VL53L0X"));
     while(1);
   }
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println(F("SSD1306 allocation failed"));
+    Serial.println(F("Failed to connect to SSD1306"));
     for(;;); // Don't proceed, loop forever
   }
   display.clearDisplay();
@@ -38,7 +38,7 @@ void loop() {
   if (measure.RangeStatus != 4) {
     display.clearDisplay();
     display.setCursor(0,0);
-    display.print("h: ");
+    display.print("d: ");
     display.println(dist);
     display.display();
     if(dist <= 20.0f){
@@ -61,13 +61,20 @@ void lookForHole() {
   //Afstand in cm
   float dist = measure.RangeMilliMeter/10.0f - 2.0f;
   
-  turnLeft(80);
+  turnLeft(70);
   delay(400);
   standStill();
-  delay(800);
-  turnRight(80);
-  if(highestValue < dist) highestValue = dist;
   delay(400);
+  for (int i = 0; i < 10; i++) {
+    turnRight(70);
+    delay(100);
+    standStill();
+    if(dist > highestValue) {
+      highestValue = dist;
+    }
+    delay(500);
+  }
+    
   standStill();
   display.clearDisplay();
   display.setCursor(0,0);
