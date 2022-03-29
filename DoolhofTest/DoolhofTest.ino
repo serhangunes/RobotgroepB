@@ -11,8 +11,8 @@ int motorPinLV = 16;
 int motorPinLA = 17;
 int motorPinRV = 18;
 int motorPinRA = 5;
-int IRPinR = 39;
-int IRPinL = 34;
+int IRPinR = 34;
+int IRPinL = 39;
 
 //declaring the variables
 int pinR;
@@ -59,72 +59,127 @@ readPins();
 
 //write the values from the IR sensor on the display
   display.setCursor(0,0);             // Start at top-left corner
-  display.print("PinL: ");
-  display.println(colourL);
   display.print("PinR: ");
-  display.println(colourR);
+  display.println(pinR);
+  display.print("PinL: ");
+  display.println(pinL);
   display.display();
 
-//If both are white then drive forward
-if(colourL == "white" && colourR == "white")
-{
-  driveForward(100);
-}
-//if right is grey then adjust to the right.
-else if(colourL == "white" && colourR == "grey")
-{
-  turnRight(100);
-}
-//if right is black then turn 90 degrees right and if there is a road ahead.
-else if(colourL == "white" && colourR == "black")
-{
-  fancy function
-}
-//if left is grey then adjust to the left.
-else if(colourL == "grey" && colourR == "white")
-{
-  turnLeft(100);
-}
-//if both are grey then turn 180 degrees.
-else if(colourL == "grey" && colourR == "grey")
-{
-  turn180();
-}
-//if right is black then turn right and check if there is a road ahead.
-else if(colourL == "grey" && colourR == "black")
-{
-  fancy function
-}
-//If left is black then turn 90 degrees to the left.
-if(colourL == "black" && colourR == "white")
-{
-  turnLeft90();
-}
-//if left is black then turn 90 degrees to the left.
-if(colourL == "black" && colourR == "grey")
-{
-  turnLeft90();
-}
-//if both are black then turn 90 degrees to the left.
-else if(colourL == "black" && colourR == "black")
-{
-  turnLeft90();
-}
-else
-{
-  standStill();
-}
-//  if(colourL == "white" && colourR == "white")  {
-//    driveForward(100);
-//  }else if(colourL == "grey" && colourR == "white") {
-//    turnLeft(100);
-//  }else if(colourL == "white" && colourR == "grey") {
-//    turnRight(100);
-//  }else if(colourL == "grey" && colourR == "grey")  {
-//    standStill();
-//  }else{
-//    standStill();
-//  }
+
+//turnLeft90(80);
+//standStill();
+//delay(1000);
+
+////If both are white then drive forward
+//if(colourL == "white" && colourR == "white")
+//{
+//  driveForward(80);
+//}
+////if right is grey then adjust to the right.
+//else if(colourL == "white" && colourR == "grey")
+//{
+//  turnRight(80);
+//}
+////if right is black then turn 90 degrees right and if there is a road ahead.
+//else if(colourL == "white" && colourR == "black")
+//{
+//  turnRight90(80);
+//}
+////if left is grey then adjust to the left.
+//else if(colourL == "grey" && colourR == "white")
+//{
+//  turnLeft(80);
+//}
+////if both are grey then turn 180 degrees.
+//else if(colourL == "grey" && colourR == "grey")
+//{
+//  standStill();
+//}
+////if right is black then turn right and check if there is a road ahead.
+//else if(colourL == "grey" && colourR == "black")
+//{
+//  turnRight90(80);
+//}
+////If left is black then turn 90 degrees to the left.
+//if(colourL == "black" && colourR == "white")
+//{
+//  turnLeft90(80);
+//}
+////if left is black then turn 90 degrees to the left.
+//if(colourL == "black" && colourR == "grey")
+//{
+//  turnLeft90(80);
+//}
+////if both are black then turn 90 degrees to the left.
+//else if(colourL == "black" && colourR == "black")
+//{
+//  turnLeft90(80);
+//}
+//else 
+//{
+//  standStill();
+//}
+
+//dit werkt om de lijn te volgen
+  if(colourL == "white" && colourR == "white")  
+  {
+    driveForward(70);
+  }
+  else if(colourL == "grey" && colourR == "white") 
+  {
+    turnLeft(70);
+  }
+  else if(colourL == "white" && colourR == "grey") 
+  {
+    turnRight(70);
+  }
+  else if(colourL == "white" && colourR == "black")
+  {
+    delay(100);
+    standStill();
+    delay(500);
+    turnRight90(80);
+    standStill();
+    delay(500);
+  }
+  else if(colourL == "grey" && colourR == "black")
+  {
+    driveForward(70);
+    delay(100);
+    standStill();
+    delay(500);
+    turnRight90(80);
+    standStill();
+    delay(500);
+  }
+  else if(colourL == "grey" && colourR == "grey")  
+  {
+    standStill();
+  }
+  else if(colourL == "black" && colourR == "white")
+  {
+    driveForward(70);
+    delay(100);
+    standStill();
+    delay(500);
+    turnLeft90(80);
+    standStill();
+    delay(500);
+  }
+  else if(colourL == "black" && colourR == "grey")
+  {
+    driveForward(70);
+    delay(100);
+    standStill();
+    delay(500);
+    turnLeft90(80);
+    standStill();
+    delay(500);    
+  }
+  else
+  {
+    standStill();
+  }
 }
 
 
@@ -141,19 +196,19 @@ void readPins() {
 pinL = analogRead(IRPinL);
 pinR = analogRead(IRPinR);
 
-  if(pinR <= 85)  {
+  if(pinR <= 80)  {
     colourR = "white";
-  }else if(pinR > 85 && pinR <=1100)  {
+  }else if(pinR > 80 && pinR <=400)  {
     colourR = "grey";
-  }else if(pinR > 1100) {
+  }else if(pinR > 400) {
     colourR = "black";
   }
 
-  if(pinL <= 70)  {
+  if(pinL <= 85)  {
     colourL = "white";
-  }else if(pinL >70 && pinL <=1100) {
+  }else if(pinL >85 && pinL <=400) {
     colourL = "grey";
-  }else if(pinL >1100)  {
+  }else if(pinL >400)  {
     colourL = "black";
   }
 }
@@ -185,20 +240,6 @@ void standStill() {
 
 void turnLeft(double percentage) {
   int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((200.0f / 100.0f) * percentage);
-  
-  analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, speedL);
-  analogWrite(motorPinLA, 0);
-}
-
-/*
- * turn right
- */
-
-void turnRight(double percentage) {
-  int speedR = int((200.0f / 100.0f) * percentage);
   int speedL = int((255.0f / 100.0f) * percentage);
   
   analogWrite(motorPinRA, 0);
@@ -208,27 +249,47 @@ void turnRight(double percentage) {
 }
 
 /*
+ * turn right
+ */
+
+void turnRight(double percentage) {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((255.0f / 100.0f) * percentage);
+  
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, speedL);
+  analogWrite(motorPinLA, 0);
+}
+
+/*
  * turn left 90
  */
 
-void turnLeft90() {
+void turnLeft90(double percentage) {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((255.0f / 100.0f) * percentage);
   analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 170);
+  analogWrite(motorPinRV, speedR);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
-  delay(500);
+  delay(600);
+  standStill();
 }
 
 /*
  * turn right 90
  */
 
-void turnRight90()  {
+void turnRight90(double percentage)  {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((255.0f / 100.0f) * percentage);
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, 255);
+  analogWrite(motorPinLV, speedL);
   analogWrite(motorPinLA, 0);
-  delay(500);
+  delay(600);
+  standStill();
 }
 
 /*
@@ -266,4 +327,8 @@ void turn90Backwards()  {
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
   delay(500);
+}
+
+void checkIfRoadAhead() {
+  
 }
