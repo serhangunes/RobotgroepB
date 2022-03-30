@@ -21,7 +21,16 @@ String colourR = "";
 String colourL = "";
 
 //declaring the screen.
-Adafruit_SSD1306 display(128, 64, &Wire, 4);
+Adafruit_SSD1306 display(128, 64, &Wire, 4);\
+
+
+//declaring interval
+const int amountOfIntervals = 4;
+
+unsigned long previousMilles[amountOfIntervals] = {0, 0, 0, 0};
+unsigned long currentMillis = 0;
+
+int intervals[amountOfIntervals] = {100, 600, 1200, 1700};
 
 void setup() {
 //setup display
@@ -130,22 +139,11 @@ readPins();
   }
   else if(colourL == "white" && colourR == "black")
   {
-    delay(100);
-    standStill();
-    delay(500);
-    turnRight90(80);
-    standStill();
-    delay(500);
+    turn90RightAdvanced();
   }
   else if(colourL == "grey" && colourR == "black")
   {
-    driveForward(70);
-    delay(100);
-    standStill();
-    delay(500);
-    turnRight90(80);
-    standStill();
-    delay(500);
+    turn90RightAdvanced();
   }
   else if(colourL == "grey" && colourR == "grey")  
   {
@@ -153,23 +151,11 @@ readPins();
   }
   else if(colourL == "black" && colourR == "white")
   {
-    driveForward(70);
-    delay(100);
-    standStill();
-    delay(500);
-    turnLeft90(80);
-    standStill();
-    delay(500);
+    turn90LeftAdvanced();
   }
   else if(colourL == "black" && colourR == "grey")
   {
-    driveForward(70);
-    delay(100);
-    standStill();
-    delay(500);
-    turnLeft90(80);
-    standStill();
-    delay(500);    
+    turn90LeftAdvanced();  
   }
   else
   {
@@ -191,7 +177,7 @@ void readPins() {
 pinL = analogRead(IRPinL);
 pinR = analogRead(IRPinR);
 
-  if(pinR <= 80)  {
+  if(pinR <= 90)  {
     colourR = "white";
   }else if(pinR > 80 && pinR <=400)  {
     colourR = "grey";
@@ -199,7 +185,7 @@ pinR = analogRead(IRPinR);
     colourR = "black";
   }
 
-  if(pinL <= 85)  {
+  if(pinL <= 90)  {
     colourL = "white";
   }else if(pinL >85 && pinL <=400) {
     colourL = "grey";
@@ -273,21 +259,6 @@ void turnLeft90(double percentage) {
 }
 
 /*
- * turn right 90
- */
-
-void turnRight90(double percentage)  {
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((255.0f / 100.0f) * percentage);
-  analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, speedL);
-  analogWrite(motorPinLA, 0);
-  delay(600);
-  standStill();
-}
-
-/*
  * drive backwards
  */
 
@@ -324,6 +295,42 @@ void turn90Backwards()  {
   delay(500);
 }
 
-void checkIfRoadAhead() {
-  
+void turn90RightAdvanced() {
+  currentMillis = millis();
+  if(millis() < currentMillis + 100)
+  {
+    driveForward(70);
+    if(millis() >= currentMillis + 100 && millis() < currentMillis + 600)
+    {
+      standStill();
+      if(millis() >= currentMillis + 600 && millis() < currentMillis + 1200)
+      {
+        turnRight(70);
+        if(millis() >= currentMillis + 1200 && millis() < currentMillis + 1700)
+        {
+          standStill();
+        }
+      }
+    }
+  }
+}
+
+void turn90LeftAdvanced() {
+  currentMillis = millis();
+  if(millis() < currentMillis + 100)
+  {
+    driveForward(70);
+    if(millis() >= currentMillis + 100 && millis() < currentMillis + 600)
+    {
+      standStill();
+      if(millis() >= currentMillis + 600 && millis() < currentMillis + 1200)
+      {
+        turnLeft(70);
+        if(millis() >= currentMillis + 1200 && millis() < currentMillis + 1700)
+        {
+          standStill();
+        }
+      }
+    }
+  }
 }
