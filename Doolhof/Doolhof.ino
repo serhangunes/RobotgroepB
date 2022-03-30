@@ -12,17 +12,16 @@ int motorPinLV = 16;
 int motorPinLA = 17;
 int motorPinRA = 18;
 int motorPinRV = 5;
-int IRPinL = 39;
-int IRPinR = 34;
+int IRPinR = 39;
+int IRPinL = 34;
 
 //declaring the variables
 int pinR;
 int pinL;
-int grey = 120;
-int black = 1100;
-int white = 75;
+String colourR = "";
+String colourL = "";
 
-Adafruit_SSD1306 display(128, 32, &Wire, 4);
+Adafruit_SSD1306 display(128, 64, &Wire, 4);
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
@@ -65,6 +64,7 @@ void loop() {
   // read the IR sensor
 pinL = analogRead(IRPinL);
 pinR = analogRead(IRPinR);
+detectColours();
 
 /*
  * display
@@ -74,12 +74,12 @@ pinR = analogRead(IRPinR);
 //clear the display
   display.clearDisplay();
 
-//write the values form the IR sensor on the display
+//write the values from the IR sensor on the display
   display.setCursor(0,0);             // Start at top-left corner
   display.print("PinL: ");
-  display.println(analogRead(IRPinL));
+  display.println(colourL);
   display.print("PinR: ");
-  display.println(analogRead(IRPinR));
+  display.println(colourR);
   display.print("Dist: ");
   display.println(measure.RangeMilliMeter);
   display.display();
@@ -87,7 +87,10 @@ pinR = analogRead(IRPinR);
 /*
  * maze
  */
- standStill();
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, 0);
+  analogWrite(motorPinLA, 0);
 
 //if(pinL < white && pinR < white){
 //    driveForward(100);
@@ -165,13 +168,34 @@ pinR = analogRead(IRPinR);
  * --------------------------------------------------------------
  */
 
+/*
+ * Detect colours
+ */
+void detectColours()  {
+  if(pinR <= 80)  {
+    colourR = "white";
+  }else if(pinR > 80 && pinR <=1100)  {
+    colourR = "grey";
+  }else if(pinR > 1100) {
+    colourR = "black";
+  }
+
+  if(pinL <= 70)  {
+    colourL = "white";
+  }else if(pinL >70 && pinL <=1100) {
+    colourL = "grey";
+  }else if(pinL >1100)  {
+    colourL = "black";
+  }
+}
+
  /*
   * Drive forward
   */
 
 void driveForward(double percentage)  {
-  int speedR = int((170.0f / 100.0f) * percentage);
-  int speedL = int((170.0f / 100.0f) * percentage);
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((255.0f / 100.0f) * percentage);
   
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, speedR);
@@ -196,10 +220,10 @@ void standStill() {
 
 void turnLeft(double percentage) {
   int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((225.0f / 100.0f) * percentage);
+  int speedL = int((255.0f / 100.0f) * percentage);
   
   analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 200);
+  analogWrite(motorPinRV, speedR);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
 }
@@ -210,11 +234,11 @@ void turnLeft(double percentage) {
 
 void turnRight(double percentage) {
   int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((225.0f / 100.0f) * percentage);
+  int speedL = int((255.0f / 100.0f) * percentage);
   
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, 200);
+  analogWrite(motorPinLV, speedL);
   analogWrite(motorPinLA, 0);
 }
 
@@ -224,7 +248,7 @@ void turnRight(double percentage) {
 
 void turnLeft90() {
   analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 170);
+  analogWrite(motorPinRV, speedL);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
   delay(500);
