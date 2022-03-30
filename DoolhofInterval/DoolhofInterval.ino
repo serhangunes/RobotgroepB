@@ -5,6 +5,10 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>  
 #include "WiFi.h"
+#define INTERVAL_MESSAGE1 100
+#define INTERVAL_MESSAGE2 600
+#define INTERVAL_MESSAGE3 1200
+#define INTERVAL_MESSAGE4 1700
 
 //declaring the pins
 int motorPinLV = 16;
@@ -25,12 +29,10 @@ Adafruit_SSD1306 display(128, 64, &Wire, 4);\
 
 
 //declaring interval
-const int amountOfIntervals = 4;
-
-unsigned long previousMilles[amountOfIntervals] = {0, 0, 0, 0};
-unsigned long currentMillis = 0;
-
-int intervals[amountOfIntervals] = {100, 600, 1200, 1700};
+unsigned long time_1 = 0;
+unsigned long time_2 = 0;
+unsigned long time_3 = 0;
+unsigned long time_4 = 0;
 
 void setup() {
 //setup display
@@ -155,7 +157,7 @@ readPins();
   }
   else if(colourL == "black" && colourR == "grey")
   {
-    turn90LeftAdvanced();  
+  turn90LeftAdvanced();  
   }
   else
   {
@@ -296,41 +298,39 @@ void turn90Backwards()  {
 }
 
 void turn90RightAdvanced() {
-  currentMillis = millis();
-  if(millis() < currentMillis + 100)
+  if(millis() < time_1 + INTERVAL_MESSAGE1)
   {
     driveForward(70);
-    if(millis() >= currentMillis + 100 && millis() < currentMillis + 600)
-    {
-      standStill();
-      if(millis() >= currentMillis + 600 && millis() < currentMillis + 1200)
-      {
-        turnRight(70);
-        if(millis() >= currentMillis + 1200 && millis() < currentMillis + 1700)
-        {
-          standStill();
-        }
-      }
-    }
+  }
+  if(millis() >= time_1 + INTERVAL_MESSAGE1 && millis() < time_2 + INTERVAL_MESSAGE2)
+  {
+    standStill();
+  }
+  if(millis() >= time_2 + INTERVAL_MESSAGE2 && millis() < time_3 + INTERVAL_MESSAGE3)
+  {
+    turnRight(70);
+  }
+  if(millis() >= time_3 + INTERVAL_MESSAGE3 && millis() < time_4 + INTERVAL_MESSAGE4)
+  {
+    standStill();
   }
 }
 
 void turn90LeftAdvanced() {
-  currentMillis = millis();
-  if(millis() < currentMillis + 100)
+  if(millis() < time_1 + INTERVAL_MESSAGE1)
   {
     driveForward(70);
-    if(millis() >= currentMillis + 100 && millis() < currentMillis + 600)
-    {
-      standStill();
-      if(millis() >= currentMillis + 600 && millis() < currentMillis + 1200)
-      {
-        turnLeft(70);
-        if(millis() >= currentMillis + 1200 && millis() < currentMillis + 1700)
-        {
-          standStill();
-        }
-      }
-    }
+  }
+  if(millis() >= time_1 + INTERVAL_MESSAGE1 && millis() < time_2 + INTERVAL_MESSAGE2)
+  {
+    standStill();
+  }
+  if(millis() >= time_2 + INTERVAL_MESSAGE2 && millis() < time_3 + INTERVAL_MESSAGE3)
+  {
+    turnLeft(70);
+  }
+  if(millis() >= time_3 + INTERVAL_MESSAGE3 && millis() < time_4 + INTERVAL_MESSAGE4)
+  {
+    standStill();
   }
 }
