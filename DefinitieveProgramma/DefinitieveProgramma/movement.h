@@ -1,5 +1,3 @@
-#include <analogWrite.h>
-
 int motorPinLA = 16;  //Rechterwiel achteruit
 int motorPinLV = 17;  //Rechterwiel vooruit
 int motorPinRV = 5;   //Linkerwiel vooruit

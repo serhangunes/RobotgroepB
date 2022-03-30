@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
+#include <analogWrite.h>
 
 #include <Adafruit_VL53L0X.h>  //Afstandssensor
 #include <Adafruit_GFX.h>      //Graphics library
@@ -10,19 +11,18 @@
 Adafruit_SSD1306 display(128, 32, &Wire, 4);
 Adafruit_VL53L0X lidar = Adafruit_VL53L0X();
 
+#include "movement.h"
 #include "butlerspelen.h"
 
 WebSocketsClient webSocket;
 
-const char* ssid = "";        //Naam van het netwerk
-const char* password = "";                //Wachtwoord van het netwerk
-const char* ipadress = "";
+const char* ssid = "Hotspot van Yannieck";        //Naam van het netwerk
+const char* password = "vmzm9931";                //Wachtwoord van het netwerk
+const char* ipadress = "battlebot1.serverict.nl";
 const int port = 33003;
 
 String macAdress = WiFi.macAddress();
 
-// bool isInGame = false;
-bool isDone = false;
 String currentGame = "idle";
 
 String status = "ready";
@@ -37,19 +37,6 @@ void setup() {
 
   Serial.begin(115200);
 
-  // if (!lidar.begin()) {
-  //   Serial.println(F("Failed to connect to VL53L0X"));
-  //   while(1);
-  // }
-  // if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-  //   Serial.println(F("Failed to connect to SSD1306"));
-  //   for(;;); // Don't proceed, loop forever
-  // }
-
-  // display.clearDisplay();
-  // display.setTextSize(1);
-  // display.setTextColor(SSD1306_WHITE);
-
   WiFi.begin(ssid, password);
   int atempts = 0;
   while (WiFi.status() != WL_CONNECTED) {
@@ -61,7 +48,6 @@ void setup() {
       Serial.println("[WIFI] Restarting device");
       exit(0);
     }
-    //status = "connecting to wifi";
   }
 
   Serial.println("[WIFI] Connected to the WiFi network");
@@ -77,9 +63,7 @@ void setup() {
 }
 
 void loop() {
-  if(currentGame == "butler") {
-    butlerLoop();
-  }
+  
   //Houd de websocket verbinding gaande
   webSocket.loop();
 
@@ -93,24 +77,23 @@ void loop() {
     //Voer dit elke 5 seconden uit
     webSocket.sendTXT("{\"status\": \"" + status + "\",\"isDriving\": " + isDriving + ",\"acceleration\":" + acceleration + "}");
   }
-  // display.clearDisplay();
-  // display.setCursor(0, 0);
-  // display.println(macAdress);
-  // display.println(status);
-  // display.display();
-
-  if (status == "finished") {
-    isDone = true;
-    // analogWrite(motorPinRA, 0);
-    // analogWrite(motorPinRV, 0);
-    // analogWrite(motorPinLV, 0);
-    // analogWrite(motorPinLA, 0);
-  } else if (status == "in_game") {
-    // analogWrite(motorPinRA, 0);
-    // analogWrite(motorPinRV, 255);
-    // analogWrite(motorPinLV, 255);
-    // analogWrite(motorPinLA, 0);
+  if(status == "in_game") {
+    if(currentGame == "butler") {    
+      //butlerLoop();
+      driveForward(100);
+    }
   }
+  if(status == "finished") {
+    standStill();
+  }
+
+  display.clearDisplay();
+  display.setTextSize(2);             // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE);        // Draw white text
+  display.setCursor(0,0);             // Start at top-left corner
+  display.print("St: ");
+  display.println(status);
+  display.display();
 }
 
 void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
@@ -125,8 +108,8 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
   String action = doc["action"];
   String game = doc["game"];
 
-  // char data[20];
-  // serializeJson(doc, data);
+  char test[100];
+  serializeJson(doc, test);
 
   switch (type) {
     case WStype_CONNECTED:
@@ -139,12 +122,15 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
     case WStype_DISCONNECTED:
       //Wanneer de verbinding met de websocket is verbroken:
       Serial.println("[WS] Disconnected from the websocket");
+      currentGame = "idle";
+      status = "ready";
       break;
     case WStype_TEXT:
       //Wanneer er tekst is ontvangen:
       //Als er succesvol is ingelogd, stuur een bericht naar de serial monitor
+      Serial.println(test);
       if (loggedin) {
-        Serial.println("[WS] Robot has logged in to the server");
+        Serial.println("[WS] Robot has logged in to the websocket");
       }
       //Als er een action is ontvangen, kijk wat die action is en print het naar de serial monitor
       if (action != "null") {
@@ -154,22 +140,21 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
             Serial.print("[SERVER] prepare game: ");
             Serial.println(game);
             status = "preparing_game";
+
             //Stuur naar de websocket wanneer de arduino klaar is om het spel te starten
             webSocket.sendTXT("{\"status\": true,\"game\": \"" + game + "\"}");
             status = "ready";
-            currentGame = game;
           }
         } else if (action == "start") {
           Serial.print("[SERVER] start game: ");
           Serial.println(game);
           status = "in_game";
+            currentGame = game;
         } else if (action == "ended") {
           Serial.print("[SERVER] ended game: ");
           Serial.println(game);
           status = "finished";
           currentGame = "idle";
-          delay(5000);
-          status = "ready";
         }
       }
       break;
