@@ -194,8 +194,8 @@ void detectColours()  {
   */
 
 void driveForward(double percentage)  {
-  int speedR = int((170.0f / 100.0f) * percentage);
-  int speedL = int((170.0f / 100.0f) * percentage);
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((255.0f / 100.0f) * percentage);
   
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, speedR);
@@ -220,10 +220,10 @@ void standStill() {
 
 void turnLeft(double percentage) {
   int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((225.0f / 100.0f) * percentage);
+  int speedL = int((255.0f / 100.0f) * percentage);
   
   analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 200);
+  analogWrite(motorPinRV, speedR);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
 }
@@ -234,11 +234,11 @@ void turnLeft(double percentage) {
 
 void turnRight(double percentage) {
   int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((225.0f / 100.0f) * percentage);
+  int speedL = int((255.0f / 100.0f) * percentage);
   
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, 200);
+  analogWrite(motorPinLV, speedL);
   analogWrite(motorPinLA, 0);
 }
 
@@ -248,7 +248,7 @@ void turnRight(double percentage) {
 
 void turnLeft90() {
   analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 170);
+  analogWrite(motorPinRV, speedL);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
   delay(500);
