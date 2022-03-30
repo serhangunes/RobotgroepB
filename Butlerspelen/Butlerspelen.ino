@@ -12,6 +12,11 @@ int motorPinRA = 18; //Linkerwiel achteruit
 Adafruit_SSD1306 display(128, 32, &Wire, 4);
 Adafruit_VL53L0X lidar = Adafruit_VL53L0X();
 
+float motorR = 255.0f;
+float motorL = 255.0f;
+
+bool canCheck = true;
+
 void setup() {
   Serial.begin(115200);
   if (!lidar.begin()) {
@@ -29,6 +34,10 @@ void setup() {
 }
 
 void loop() {
+  // driveForward(100);
+  // delay(2000);
+  // standStill();
+  // delay(2000);
   VL53L0X_RangingMeasurementData_t measure;
   lidar.rangingTest(&measure, false);
 
@@ -41,7 +50,7 @@ void loop() {
     display.print("d: ");
     display.println(dist);
     display.display();
-    if(dist <= 20.0f){
+    if(dist <= 30.0f && canCheck == true){
       //Serial.print("Distance (mm): "); Serial.println(dist);
       standStill();
       delay(1000);
@@ -55,6 +64,7 @@ void loop() {
 float highestValue = 0;
 
 void lookForHole() {
+  canCheck = false;
   VL53L0X_RangingMeasurementData_t measure;
   lidar.rangingTest(&measure, false);
 
@@ -65,13 +75,24 @@ void lookForHole() {
   delay(400);
   standStill();
   delay(400);
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 8; i++) {
     turnRight(70);
     delay(100);
+    VL53L0X_RangingMeasurementData_t measure;
+    lidar.rangingTest(&measure, false);
+
+    //Afstand in cm
+    dist = measure.RangeMilliMeter/10.0f - 2.0f;
     standStill();
     if(dist > highestValue) {
       highestValue = dist;
-    }
+    }    
+    display.clearDisplay();
+    display.setCursor(0,0);
+    display.print(i);
+    display.print(": ");
+    display.println(dist);
+    display.display();
     delay(500);
   }
     
@@ -82,19 +103,31 @@ void lookForHole() {
   display.println(highestValue);
   display.display();
   delay(2000);
+
+  do {
+    VL53L0X_RangingMeasurementData_t measure;
+    lidar.rangingTest(&measure, false);
+
+    //Afstand in cm
+    dist = measure.RangeMilliMeter/10.0f - 2.0f;
+    turnLeft(70);    
+    canCheck = false;
+  } while (dist >= highestValue - 5 && dist <= highestValue + 5);
+
+  driveForward(80);
+  canCheck = true;
 }
 
 void standStill() {
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
-  delay(70);
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, 0);
 }
 
 void driveForward(double percentage) {
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((225.0f / 100.0f) * percentage);
+  int speedR = int((motorR / 100.0f) * percentage);
+  int speedL = int((motorL / 100.0f) * percentage);
   
   analogWrite(motorPinRA, speedR);
   analogWrite(motorPinRV, 0);
@@ -103,8 +136,8 @@ void driveForward(double percentage) {
 }
 
 void turnLeft(double percentage) {
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((225.0f / 100.0f) * percentage);
+  int speedR = int((motorR / 100.0f) * percentage);
+  int speedL = int((motorL / 100.0f) * percentage);
   
   analogWrite(motorPinRA, speedR);
   analogWrite(motorPinRV, 0);
@@ -113,8 +146,8 @@ void turnLeft(double percentage) {
 }
 
 void turnRight(double percentage)  {
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((225.0f / 100.0f) * percentage);
+  int speedR = int((motorR / 100.0f) * percentage);
+  int speedL = int((motorL / 100.0f) * percentage);
   
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, speedR);

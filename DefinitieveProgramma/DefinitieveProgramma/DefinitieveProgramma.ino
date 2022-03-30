@@ -2,23 +2,28 @@
 #include <WiFi.h>
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <analogWrite.h>
+
+#include <Adafruit_VL53L0X.h>  //Afstandssensor
+#include <Adafruit_GFX.h>      //Graphics library
+#include <Adafruit_SSD1306.h>  //Schermpje
 
 Adafruit_SSD1306 display(128, 32, &Wire, 4);
+Adafruit_VL53L0X lidar = Adafruit_VL53L0X();
+
+#include "butlerspelen.h"
 
 WebSocketsClient webSocket;
 
-const char* ssid = "battlebot_nl";      //Naam van het netwerk
-const char* password = "battlebot_nl";  //Wachtwoord van het netwerk
-const char* ipadress = "10.110.111.103";
-const int port = 3003;
+const char* ssid = "";        //Naam van het netwerk
+const char* password = "";                //Wachtwoord van het netwerk
+const char* ipadress = "";
+const int port = 33003;
 
 String macAdress = WiFi.macAddress();
 
-bool isInGame = false;
+// bool isInGame = false;
 bool isDone = false;
+String currentGame = "idle";
 
 String status = "ready";
 bool isDriving;
@@ -27,28 +32,23 @@ int acceleration;
 unsigned long previousMillis = 0;
 const long interval = 5000;
 
-int motorPinLA = 16;  //Rechterwiel achteruit
-int motorPinLV = 17;  //Rechterwiel vooruit
-int motorPinRV = 5;   //Linkerwiel vooruit
-int motorPinRA = 18;  //Linkerwiel achteruit
-
 void setup() {
-  pinMode(motorPinRA, OUTPUT);
-  pinMode(motorPinRV, OUTPUT);
-  pinMode(motorPinLV, OUTPUT);
-  pinMode(motorPinLA, OUTPUT);
+  butlerInit();
 
   Serial.begin(115200);
 
-  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    for (;;)
-      ;  // Don't proceed, loop forever
-  }
+  // if (!lidar.begin()) {
+  //   Serial.println(F("Failed to connect to VL53L0X"));
+  //   while(1);
+  // }
+  // if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+  //   Serial.println(F("Failed to connect to SSD1306"));
+  //   for(;;); // Don't proceed, loop forever
+  // }
 
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
+  // display.clearDisplay();
+  // display.setTextSize(1);
+  // display.setTextColor(SSD1306_WHITE);
 
   WiFi.begin(ssid, password);
   int atempts = 0;
@@ -77,7 +77,9 @@ void setup() {
 }
 
 void loop() {
-
+  if(currentGame == "butler") {
+    butlerLoop();
+  }
   //Houd de websocket verbinding gaande
   webSocket.loop();
 
@@ -91,35 +93,40 @@ void loop() {
     //Voer dit elke 5 seconden uit
     webSocket.sendTXT("{\"status\": \"" + status + "\",\"isDriving\": " + isDriving + ",\"acceleration\":" + acceleration + "}");
   }
-  display.clearDisplay();
-  display.setCursor(0, 0);
-  display.println(macAdress);
-  display.println(status);
-  display.display();
+  // display.clearDisplay();
+  // display.setCursor(0, 0);
+  // display.println(macAdress);
+  // display.println(status);
+  // display.display();
 
   if (status == "finished") {
     isDone = true;
-    analogWrite(motorPinRA, 0);
-    analogWrite(motorPinRV, 0);
-    analogWrite(motorPinLV, 0);
-    analogWrite(motorPinLA, 0);
+    // analogWrite(motorPinRA, 0);
+    // analogWrite(motorPinRV, 0);
+    // analogWrite(motorPinLV, 0);
+    // analogWrite(motorPinLA, 0);
   } else if (status == "in_game") {
-    analogWrite(motorPinRA, 0);
-    analogWrite(motorPinRV, 255);
-    analogWrite(motorPinLV, 255);
-    analogWrite(motorPinLA, 0);
+    // analogWrite(motorPinRA, 0);
+    // analogWrite(motorPinRV, 255);
+    // analogWrite(motorPinLV, 255);
+    // analogWrite(motorPinLA, 0);
   }
 }
 
 void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
   //status = "connecting to ws";
   //Maak een nieuw JSON bestand aan en sla de verkregen informatie er in op, haal daarna de waarden uit de JSON en stop ze in variabelen
-  DynamicJsonDocument doc(1024);
+  
+  const size_t capacity = JSON_OBJECT_SIZE(3);
+  DynamicJsonDocument doc(capacity);
   deserializeJson(doc, payload);
 
   bool loggedin = doc["loggedin"];
   String action = doc["action"];
   String game = doc["game"];
+
+  // char data[20];
+  // serializeJson(doc, data);
 
   switch (type) {
     case WStype_CONNECTED:
@@ -141,16 +148,16 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
       }
       //Als er een action is ontvangen, kijk wat die action is en print het naar de serial monitor
       if (action != "null") {
-        Serial.println("[WS] Recieved info from websocket:");
+        //Serial.println("[WS] Recieved info from websocket:");
         if (action == "prepare") {
-          if (!isInGame) {
+          if (currentGame == "idle") {
             Serial.print("[SERVER] prepare game: ");
             Serial.println(game);
             status = "preparing_game";
             //Stuur naar de websocket wanneer de arduino klaar is om het spel te starten
             webSocket.sendTXT("{\"status\": true,\"game\": \"" + game + "\"}");
             status = "ready";
-            isInGame = true;
+            currentGame = game;
           }
         } else if (action == "start") {
           Serial.print("[SERVER] start game: ");
@@ -160,7 +167,7 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
           Serial.print("[SERVER] ended game: ");
           Serial.println(game);
           status = "finished";
-          isInGame = false;
+          currentGame = "idle";
           delay(5000);
           status = "ready";
         }
