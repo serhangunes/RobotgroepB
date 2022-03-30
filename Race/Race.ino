@@ -52,23 +52,24 @@ void loop(){
   int pinR = analogRead(IRPinR)/1100;
 
 standStill();
-  //if robot sees black with bothstand still
-//  if(pinL >= 1 && pinR >= 1){
-//    standStill();
-//    delay(500);
-//    driveBackwards();
-//    delay(500);
-//    //if robot sees black on the right then drive left
-//  }else if(pinL == 0 && pinR >= 1){
-//    turnLeft(80);
-//    //if robot sees black on the left then drive right
-//  }else if(pinL >= 1 && pinR == 0){
-//    turnRight(80);
-//    //if the robot sees no black then drive forward
-//  }else if(pinL == 0 && pinR == 0){
-//    driveForward(80);
-//  }
+  if robot sees black with both, stand still
+  if(pinL >= 1 && pinR >= 1){
+    standStill();
+    delay(500);
+    driveBackwards();
+    delay(500);
+    //if robot sees black on the right then drive left
+  }else if(pinL == 0 && pinR >= 1){
+    turnLeft(80);
+    //if robot sees black on the left then drive right
+  }else if(pinL >= 1 && pinR == 0){
+    turnRight(80);
+    //if the robot sees no black then drive forward
+  }else if(pinL == 0 && pinR == 0){
+    driveForward(80);
+  }
 }
+
 
 /*
  * functions
