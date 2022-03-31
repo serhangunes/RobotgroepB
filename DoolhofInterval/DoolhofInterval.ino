@@ -5,10 +5,11 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>  
 #include "WiFi.h"
-#define INTERVAL_MESSAGE1 100
-#define INTERVAL_MESSAGE2 600
-#define INTERVAL_MESSAGE3 1200
-#define INTERVAL_MESSAGE4 1700
+
+//millis variables
+unsigned long timerMillis = 0;
+unsigned long currentTime = millis();
+String gameAction = "";
 
 //declaring the pins
 int motorPinLV = 16;

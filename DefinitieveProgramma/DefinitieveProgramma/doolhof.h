@@ -1,11 +1,6 @@
 //declaring the variables
 String colourR = "";
 String colourL = "";
-
-//millis variables
-unsigned long timerMillis = 0;
-unsigned long currentTime = millis();
-String gameAction = "";
 /*
    --------------------------------------------------------------
    -------------------------Functions----------------------------
@@ -37,66 +32,44 @@ void readPins() {
 }
 
 
-/*
-   turn left 90
-*/
-
-
-void turn90RightAdvanced() {
-  currentTime = millis();
-  if (timerMillis == 0)  {
-    timerMillis = millis();
-  }
-  if (currentTime - timerMillis <= 100) {
-    driveForward();
-  } else if (currentTime - timerMillis <= 600)  {
+/* 
+ *  turn left 90
+ */
+void turnRightAdvanced() {
+    driveForward(70);
+    delay(100);
     standStill();
-  } else if (currentTime - timerMillis <= 1200) {
-    turnRightMaze();
-  } else if (currentTime - timerMillis <= 1700) {
+    delay(500);
+    turnRight(80);
+    delay(600);
     standStill();
-  } else {
-    timerMillis = 0;
-    gameAction = "";
-  }
+    delay(500);
 }
 
-void turn90LeftAdvanced() {
-  currentTime = millis();
-  if (timerMillis == 0)  {
-    timerMillis = millis();
-  }
-  if (currentTime - timerMillis <= 100) {
-    driveForward();
-  } else if (currentTime - timerMillis <= 600)  {
+
+/* 
+ *  turn right 90
+ */
+void turnLeftAdvanced() {
+    driveForward(70);
+    delay(100);
     standStill();
-  } else if (currentTime - timerMillis <= 1200) {
-    turnLeftMaze();
-  } else if (currentTime - timerMillis <= 1700) {
+    delay(500);
+    turnLeft(80);
+    delay(600);
     standStill();
-  } else {
-    timerMillis = 0;
-    gameAction = "";
-  }
+    delay(500);
 }
 
-void turn180()  {
-  currentTime = millis();
-  if (timerMillis == 0)  {
-    timerMillis = millis();
-  }
-  if (currentTime - timerMillis <= 100) {
-    driveForward();
-  } else if (currentTime - timerMillis <= 600)  {
-    standStill();
-  } else if (currentTime - timerMillis <= 1200) {
-    turnLeftMaze();
-  } else if (currentTime - timerMillis <= 1700) {
-    standStill();
-  } else {
-    timerMillis = 0;
-    gameAction = "";
-  }
+void turn180(double percentage)  {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((225.0f / 100.0f) * percentage);
+  
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, speedR);
+  analogWrite(motorPinLV, 0);  
+  analogWrite(motorPinLA, 0);
+  delay(800);
 }
 
 /*
@@ -110,8 +83,8 @@ void mazeLoop() {
   readPins();
 
   /*
-     display
-  */
+   * display
+   */
   //clear the display
   display.clearDisplay();
 
@@ -122,15 +95,6 @@ void mazeLoop() {
   display.print("PinL: ");
   display.println(pinL);
   display.display();
-
-  if (gameAction == "turnLeft")
-  {
-    turnLeftAdvanced();
-    return;
-  } else if (gameAction == "turnRight") {
-    turnRightAdvanced();
-    return;
-  }
 
   if (colourL == "white" && colourR == "white")
   {
@@ -146,11 +110,11 @@ void mazeLoop() {
   }
   else if (colourL == "white" && colourR == "black")
   {
-    gameAction = "turnRight";
+    turnRightAdvanced();
   }
   else if (colourL == "grey" && colourR == "black")
   {
-    gameAction = "turnRight";
+    turnRightAdvanced();
   }
   else if (colourL == "grey" && colourR == "grey")
   {
@@ -158,11 +122,11 @@ void mazeLoop() {
   }
   else if (colourL == "black" && colourR == "white")
   {
-    gameAction = "turnLeft";
+    turnLeftAdvanced();
   }
   else if (colourL == "black" && colourR == "grey")
   {
-    gameAction = "turnLeft";
+    turnLeftAdvanced();
   }
   else
   {

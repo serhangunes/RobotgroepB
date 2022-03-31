@@ -63,7 +63,9 @@ readPins();
   display.display();
 
 
-//turnLeft90(80);
+//turn180(90);
+//standStill();
+//delay(1000);
 //standStill();
 //delay(1000);
 
@@ -132,46 +134,23 @@ readPins();
   }
   else if(colourL == "white" && colourR == "black")
   {
-    delay(100);
-    standStill();
-    delay(500);
-    turnRight90(80);
-    standStill();
-    delay(500);
+    turnRightAdvanced();
   }
   else if(colourL == "grey" && colourR == "black")
   {
-    driveForward(70);
-    delay(100);
-    standStill();
-    delay(500);
-    turnRight90(80);
-    standStill();
-    delay(500);
+    turnRightAdvanced();
   }
   else if(colourL == "grey" && colourR == "grey")  
   {
-    standStill();
+    turn180(90);
   }
   else if(colourL == "black" && colourR == "white")
   {
-    driveForward(70);
-    delay(100);
-    standStill();
-    delay(500);
-    turnLeft90(80);
-    standStill();
-    delay(500);
+    turnLeftAdvanced();
   }
   else if(colourL == "black" && colourR == "grey")
   {
-    driveForward(70);
-    delay(100);
-    standStill();
-    delay(500);
-    turnLeft90(80);
-    standStill();
-    delay(500);    
+    turnLeftAdvanced();   
   }
   else
   {
@@ -195,17 +174,17 @@ pinR = analogRead(IRPinR);
 
   if(pinR <= 80)  {
     colourR = "white";
-  }else if(pinR > 80 && pinR <=400)  {
+  }else if(pinR > 80 && pinR <=250)  {
     colourR = "grey";
-  }else if(pinR > 400) {
+  }else if(pinR > 250) {
     colourR = "black";
   }
 
   if(pinL <= 85)  {
     colourL = "white";
-  }else if(pinL >85 && pinL <=400) {
+  }else if(pinL >85 && pinL <=250) {
     colourL = "grey";
-  }else if(pinL >400)  {
+  }else if(pinL >250)  {
     colourL = "black";
   }
 }
@@ -306,13 +285,14 @@ void driveBackwards(double percentage){
 /*
  * turn 180
  */
-
-void turn180()  {
-  analogWrite(motorPinRA, 255);
-  analogWrite(motorPinRV, 0);
+void turn180(double percentage)  {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((225.0f / 100.0f) * percentage);
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, speedR);
   analogWrite(motorPinLV, 0);
-  analogWrite(motorPinLA, 0);
-  delay(1000);
+  analogWrite(motorPinLA, speedL);
+  delay(600);
 }
 
 /*
@@ -326,6 +306,31 @@ void turn90Backwards()  {
   delay(500);
 }
 
-void checkIfRoadAhead() {
-  
+/* 
+ *  turn left 90
+ */
+void turnRightAdvanced() {
+    driveForward(70);
+    delay(100);
+    standStill();
+    delay(500);
+    turnRight(80);
+    delay(600);
+    standStill();
+    delay(500);
+}
+
+
+/* 
+ *  turn right 90
+ */
+void turnLeftAdvanced() {
+    driveForward(70);
+    delay(100);
+    standStill();
+    delay(500);
+    turnLeft(80);
+    delay(600);
+    standStill();
+    delay(500);
 }
