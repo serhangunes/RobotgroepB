@@ -30,6 +30,16 @@ void driveForward(double percentage) {
   analogWrite(motorPinLA, speedL);
 }
 
+void driveBackwards(double percentage) {
+  int speedR = int((motorR / 100.0f) * percentage);
+  int speedL = int((motorL / 100.0f) * percentage);
+
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, speedR);
+  analogWrite(motorPinLV, speedl);
+  analogWrite(motorPinLA, 0);
+}
+
 void turnLeft(double percentage) {
   int speedR = int((motorR / 100.0f) * percentage);
   int speedL = int((motorL / 100.0f) * percentage);

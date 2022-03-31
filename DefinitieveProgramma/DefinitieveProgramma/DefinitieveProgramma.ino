@@ -1,38 +1,36 @@
 #include <Arduino.h>
-#include <WiFi.h>
-#include <WebSocketsClient.h>
-#include <ArduinoJson.h>
-#include <analogWrite.h>
+#include <WiFi.h> //De WiFi library
+#include <WebSocketsClient.h> //De websocket library
+#include <ArduinoJson.h> //De arduino JSON library
+#include <analogWrite.h> //De analogWrite library
 
-#include <Adafruit_VL53L0X.h>  //Afstandssensor
-#include <Adafruit_GFX.h>      //Graphics library
-#include <Adafruit_SSD1306.h>  //Schermpje
+#include <Adafruit_VL53L0X.h> //De LiDAR library
+#include <Adafruit_GFX.h> //De graphics library
+#include <Adafruit_SSD1306.h> //De scherm library
 
-Adafruit_SSD1306 display(128, 32, &Wire, 4);
-Adafruit_VL53L0X lidar = Adafruit_VL53L0X();
+Adafruit_SSD1306 display(128, 32, &Wire, 4); //Variable voor de display
+Adafruit_VL53L0X lidar = Adafruit_VL53L0X(); //Variable voor de LiDAR
+WebSocketsClient webSocket; //Variable voor de websocket
 
-#include "movement.h"
-#include "butlerspelen.h"
+const char* ssid = "Hotspot van Yannieck"; //De naam van het netwerk
+const char* password = "vmzm9931"; //Het wachtwoord van het netwerk
+const char* ipadress = "battlebot1.serverict.nl"; //Het ip adres van de server
+const int port = 33003; //De poort waar de websocket op draait
 
-WebSocketsClient webSocket;
+String currentGame = "idle"; //Variable voor het huidige spel
+String status = "ready"; //Variable voor de status van de robot
+bool isDriving = false; //De rijstatus van de robot
+int acceleration = 0; //De acceleratie van de robot
+ 
+unsigned long previousMillis = 0; //Te tijd sinds de laatst gemeten tijd
+const long interval = 5000; //De tijd die de loop moet wachten
 
-const char* ssid = "Hotspot van Yannieck";        //Naam van het netwerk
-const char* password = "vmzm9931";                //Wachtwoord van het netwerk
-const char* ipadress = "battlebot1.serverict.nl";
-const int port = 33003;
-
-String macAdress = WiFi.macAddress();
-
-String currentGame = "idle";
-
-String status = "ready";
-bool isDriving;
-int acceleration;
-
-unsigned long previousMillis = 0;
-const long interval = 5000;
+#include "movement.h" //Importeer het bestand met de motor functies
+#include "butlerspelen.h" //Importeer het butlerspelen bestand
+#include "race.h" //Importeer het race bestand
 
 void setup() {
+  //Initialiseer het butlerspel
   butlerInit();
 
   Serial.begin(115200);
@@ -81,6 +79,9 @@ void loop() {
     if(currentGame == "butler") {    
       //butlerLoop();
       driveForward(100);
+    } else if(currentGame == "race") {
+      //raceLoop();
+      driveBackwards(100);
     }
   }
   if(status == "finished") {
@@ -116,7 +117,7 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
       //Wanneer er verbonden is met de websocket:
       Serial.println("[WS] Connected to the websocket");
       //Vraag de server om in te loggen
-      webSocket.sendTXT("{\"action\": \"login\",\"id\": \"" + macAdress + "\"}");
+      webSocket.sendTXT("{\"action\": \"login\",\"id\": \"" + WiFi.macAddress() + "\"}");
       //status = "connected";
       break;
     case WStype_DISCONNECTED:
