@@ -6,7 +6,6 @@ String colourL = "";
 unsigned long timerMillis = 0;
 unsigned long currentTime = millis();
 String gameAction = "";
-
 /*
    --------------------------------------------------------------
    -------------------------Functions----------------------------
@@ -44,27 +43,61 @@ void readPins() {
 
 
 void turn90RightAdvanced() {
+  currentTime = millis();
   if (timerMillis == 0)  {
     timerMillis = millis();
   }
-  if(currentTime - timerMillis <= 100){
+  if (currentTime - timerMillis <= 100) {
     driveForward();
-  }else if(currentTime - timerMillis <= 600)  {
+  } else if (currentTime - timerMillis <= 600)  {
     standStill();
-  }else if(currentTime - timerMillis <= 1200){
-    turnRight();
-  }else if(currentTime - timerMillis <= 1700){
+  } else if (currentTime - timerMillis <= 1200) {
+    turnRightMaze();
+  } else if (currentTime - timerMillis <= 1700) {
     standStill();
-  }else{
+  } else {
     timerMillis = 0;
     gameAction = "";
   }
 }
 
 void turn90LeftAdvanced() {
-
+  currentTime = millis();
+  if (timerMillis == 0)  {
+    timerMillis = millis();
+  }
+  if (currentTime - timerMillis <= 100) {
+    driveForward();
+  } else if (currentTime - timerMillis <= 600)  {
+    standStill();
+  } else if (currentTime - timerMillis <= 1200) {
+    turnLeftMaze();
+  } else if (currentTime - timerMillis <= 1700) {
+    standStill();
+  } else {
+    timerMillis = 0;
+    gameAction = "";
+  }
 }
 
+void turn180()  {
+  currentTime = millis();
+  if (timerMillis == 0)  {
+    timerMillis = millis();
+  }
+  if (currentTime - timerMillis <= 100) {
+    driveForward();
+  } else if (currentTime - timerMillis <= 600)  {
+    standStill();
+  } else if (currentTime - timerMillis <= 1200) {
+    turnLeftMaze();
+  } else if (currentTime - timerMillis <= 1700) {
+    standStill();
+  } else {
+    timerMillis = 0;
+    gameAction = "";
+  }
+}
 
 /*
  * --------------------------------------------------------------
