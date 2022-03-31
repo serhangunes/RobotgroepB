@@ -53,18 +53,6 @@ void lookForHole() {
   canCheck = true;
 }
 
-void butlerInit() {
-  motorInit();
-  if (!lidar.begin()) {
-    Serial.println(F("Failed to connect to VL53L0X"));
-    while(1);
-  }
-  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println(F("Failed to connect to SSD1306"));
-    for(;;); // Don't proceed, loop forever
-  }
-}
-
 void butlerLoop() {
   VL53L0X_RangingMeasurementData_t measure;
   lidar.rangingTest(&measure, false);

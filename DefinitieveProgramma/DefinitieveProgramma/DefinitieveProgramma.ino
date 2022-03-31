@@ -37,8 +37,17 @@ int pinL;
 #include "doolhof.h" //Importeer het doolhof bestand
 
 void setup() {
-  //Initialiseer het butlerspel
-  butlerInit();
+  //Initialiseer het motor
+  motorInit();
+
+  if (!lidar.begin()) {
+    Serial.println(F("Failed to connect to VL53L0X"));
+    while(1);
+  }
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("Failed to connect to SSD1306"));
+    for(;;); // Don't proceed, loop forever
+  }
 
   Serial.begin(115200);
 
@@ -89,6 +98,9 @@ void loop() {
     } else if(currentGame == "race") {
       //raceLoop();
       driveBackwards(100);
+    } else if(currentGame == "maze") {
+      //mazeLoop();
+      turnLeft(100);
     }
   }
   if(status == "finished") {

@@ -14,28 +14,7 @@ unsigned long time_2 = 0;
 unsigned long time_3 = 0;
 unsigned long time_4 = 0;
 
-void setup() {
-//setup display
-  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
-  }
-  
-  display.clearDisplay();
-  display.setTextSize(2);
-  display.setTextColor(SSD1306_WHITE);
-  display.display();
-
-  //setup pins
-  Serial.begin(115200);
-  pinMode(motorPinRA, OUTPUT);
-  pinMode(motorPinRV, OUTPUT);
-  pinMode(motorPinLV, OUTPUT);
-  pinMode(motorPinLA, OUTPUT);
-
-}
-
-void loop() {
+void mazeLoop() {
   //detect the different tapes.
   readPins();
 
