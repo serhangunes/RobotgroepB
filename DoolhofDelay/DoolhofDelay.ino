@@ -45,7 +45,9 @@ void setup() {
 }
 
 void loop() {
+  //detect the different tapes.
 readPins();
+
 /*
  * display
  */
@@ -115,7 +117,7 @@ readPins();
 //  standStill();
 //}
 
-//dit werkt om de lijn te volgen
+//this works for following the line of the maze.
   if(colourL == "white" && colourR == "white")  
   {
     driveForward(70);

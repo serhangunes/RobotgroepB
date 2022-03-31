@@ -56,7 +56,9 @@ void setup() {
 }
 
 void loop() {
-readPins();
+  //detect the different tapes.
+  readPins();
+
 /*
  * display
  */
@@ -126,7 +128,7 @@ readPins();
 //  standStill();
 //}
 
-//dit werkt om de lijn te volgen
+
   if(colourL == "white" && colourR == "white")  
   {
     driveForward(70);
