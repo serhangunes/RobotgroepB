@@ -35,7 +35,7 @@ void setup() {
   display.setTextColor(SSD1306_WHITE);
   display.display();
 
-  //setup pins
+//setup pins
   Serial.begin(115200);
   pinMode(motorPinRA, OUTPUT);
   pinMode(motorPinRV, OUTPUT);
@@ -63,95 +63,52 @@ readPins();
   display.display();
 
 
-//turn180(90);
-//standStill();
-//delay(1000);
-//standStill();
-//delay(1000);
-
-////If both are white then drive forward
-//if(colourL == "white" && colourR == "white")
-//{
-//  driveForward(80);
-//}
-////if right is grey then adjust to the right.
-//else if(colourL == "white" && colourR == "grey")
-//{
-//  turnRight(80);
-//}
-////if right is black then turn 90 degrees right and if there is a road ahead.
-//else if(colourL == "white" && colourR == "black")
-//{
-//  turnRight90(80);
-//}
-////if left is grey then adjust to the left.
-//else if(colourL == "grey" && colourR == "white")
-//{
-//  turnLeft(80);
-//}
-////if both are grey then turn 180 degrees.
-//else if(colourL == "grey" && colourR == "grey")
-//{
-//  standStill();
-//}
-////if right is black then turn right and check if there is a road ahead.
-//else if(colourL == "grey" && colourR == "black")
-//{
-//  turnRight90(80);
-//}
-////If left is black then turn 90 degrees to the left.
-//if(colourL == "black" && colourR == "white")
-//{
-//  turnLeft90(80);
-//}
-////if left is black then turn 90 degrees to the left.
-//if(colourL == "black" && colourR == "grey")
-//{
-//  turnLeft90(80);
-//}
-////if both are black then turn 90 degrees to the left.
-//else if(colourL == "black" && colourR == "black")
-//{
-//  turnLeft90(80);
-//}
-//else 
-//{
-//  standStill();
-//}
 
 //this works for following the line of the maze.
+//If both are white then drive forward
   if(colourL == "white" && colourR == "white")  
   {
     driveForward(70);
   }
+//if left is grey then adjust to the left.
   else if(colourL == "grey" && colourR == "white") 
   {
     turnLeft(70);
   }
+//if right is grey then adjust to the right.
   else if(colourL == "white" && colourR == "grey") 
   {
     turnRight(70);
   }
+//if right is black then turn 90 degrees to the right.
   else if(colourL == "white" && colourR == "black")
   {
-    turnRightAdvanced();
+    lookFunction();
   }
+//if right is black then turn 90 degrees to the right.
   else if(colourL == "grey" && colourR == "black")
   {
     turnRightAdvanced();
   }
+//if both are grey then turn 180 degrees.
   else if(colourL == "grey" && colourR == "grey")  
   {
     turn180(90);
   }
+//if left is black then turn 90 degrees to the right.
   else if(colourL == "black" && colourR == "white")
   {
     turnLeftAdvanced();
   }
+//if left is black then turn 90 degrees to the right.
   else if(colourL == "black" && colourR == "grey")
   {
     turnLeftAdvanced();   
   }
+  else if(colourL == "black" && colourR == "black") {
+    turnLeftAdvanced();
+  }
+//else just stand still.
   else
   {
     standStill();
@@ -165,25 +122,31 @@ readPins();
  * --------------------------------------------------------------
  */
 
- /*
+/*
  * Read the pins and give a colour
  */
 void readPins() {
 pinL = analogRead(IRPinL);
 pinR = analogRead(IRPinR);
 
+//if the sensor reads less than 80 it's white.
   if(pinR <= 80)  {
     colourR = "white";
+//if the sensor read more than 80 and less than 250 it's grey.
   }else if(pinR > 80 && pinR <=250)  {
     colourR = "grey";
+//if the sensor reads more than 250 then it's black.
   }else if(pinR > 250) {
     colourR = "black";
   }
 
+//if the sensor reads less than 80 it's white.
   if(pinL <= 85)  {
     colourL = "white";
+//if the sensor read more than 80 and less than 250 it's grey.
   }else if(pinL >85 && pinL <=250) {
     colourL = "grey";
+//if the sensor reads more than 250 then it's black.
   }else if(pinL >250)  {
     colourL = "black";
   }
@@ -333,4 +296,17 @@ void turnLeftAdvanced() {
     delay(600);
     standStill();
     delay(500);
+}
+
+//look if there is a way forward.
+void lookFunction() {
+  turnRightAdvanced();
+  driveBackwards(70);
+  if(colourL == "black" && colourR == "black")  {
+    standStill();
+    delay(500);
+    turnLeftAdvanced();
+  }else{
+    driveForward(70);
+  }
 }
