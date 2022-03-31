@@ -59,3 +59,33 @@ void turnRight(double percentage) {
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, speedL);
 }
+
+//void turnLeft90(double percentage) {
+//  int speedR = int((255.0f / 100.0f) * percentage);
+//  int speedL = int((255.0f / 100.0f) * percentage);
+//  analogWrite(motorPinRA, 0);
+//  analogWrite(motorPinRV, speedR);
+//  analogWrite(motorPinLV, 0);
+//  analogWrite(motorPinLA, 0);
+//  delay(600);
+//  standStill();
+//}
+
+//void turn180()  {
+//  analogWrite(motorPinRA, 255);
+//  analogWrite(motorPinRV, 0);
+//  analogWrite(motorPinLV, 0);
+//  analogWrite(motorPinLA, 0);
+//  delay(1000);
+//}
+//
+///*
+// * turn 90 backwards
+// */
+//void turn90Backwards()  {
+//  analogWrite(motorPinRA, 255);
+//  analogWrite(motorPinRV, 0);
+//  analogWrite(motorPinLV, 0);
+//  analogWrite(motorPinLA, 0);
+//  delay(500);
+//}

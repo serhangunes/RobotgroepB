@@ -1,11 +1,3 @@
-int motorPinLA = 16; //Linkerwiel achteruit
-int motorPinLV = 17; //Linkerwiel vooruit
-int motorPinRV = 5; //Rechterwiel vooruit
-int motorPinRA = 18; //Rechterwiel achteruit
-int IRPinR = 39;// IR pin rechts
-int IRPinL = 34;// IR pin links
-int pinR = 0;
-int pinL = 0;
 int colorThreshold = 1100;
 
 void raceLoop() {

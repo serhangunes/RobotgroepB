@@ -25,9 +25,16 @@ int acceleration = 0; //De acceleratie van de robot
 unsigned long previousMillis = 0; //Te tijd sinds de laatst gemeten tijd
 const long interval = 5000; //De tijd die de loop moet wachten
 
+//declaring the pins
+int IRPinR = 34;
+int IRPinL = 39;
+int pinR;
+int pinL;
+
 #include "movement.h" //Importeer het bestand met de motor functies
 #include "butlerspelen.h" //Importeer het butlerspelen bestand
 #include "race.h" //Importeer het race bestand
+#include "doolhof.h" //Importeer het doolhof bestand
 
 void setup() {
   //Initialiseer het butlerspel
