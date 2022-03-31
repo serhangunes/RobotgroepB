@@ -88,7 +88,7 @@ readPins();
 //if right is black then turn 90 degrees to the right.
   else if(colourL == "grey" && colourR == "black")
   {
-    turnRightAdvanced();
+    lookFunction();
   }
 //if both are grey then turn 180 degrees.
   else if(colourL == "grey" && colourR == "grey")  
@@ -298,7 +298,9 @@ void turnLeftAdvanced() {
     delay(500);
 }
 
-//look if there is a way forward.
+/*
+ * Look if there is a road ahead.
+ */
 void lookFunction() {
   turnRightAdvanced();
   driveBackwards(70);
