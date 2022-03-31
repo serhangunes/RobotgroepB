@@ -14,6 +14,87 @@ unsigned long time_2 = 0;
 unsigned long time_3 = 0;
 unsigned long time_4 = 0;
 
+/*
+ * --------------------------------------------------------------
+ * -------------------------Functions----------------------------
+ * --------------------------------------------------------------
+ */
+
+ /*
+ * Read the pins and give a colour
+ */
+void readPins() {
+pinL = analogRead(IRPinL);
+pinR = analogRead(IRPinR);
+
+  if(pinR <= 90)  {
+    colourR = "white";
+  }else if(pinR > 80 && pinR <=400)  {
+    colourR = "grey";
+  }else if(pinR > 400) {
+    colourR = "black";
+  }
+
+  if(pinL <= 90)  {
+    colourL = "white";
+  }else if(pinL >85 && pinL <=400) {
+    colourL = "grey";
+  }else if(pinL >400)  {
+    colourL = "black";
+  }
+}
+
+
+/*
+ * turn left 90
+ */
+
+
+void turn90RightAdvanced() {
+  if(millis() < time_1 + INTERVAL_MESSAGE1)
+  {
+    driveForward(70);
+  }
+  if(millis() >= time_1 + INTERVAL_MESSAGE1 && millis() < time_2 + INTERVAL_MESSAGE2)
+  {
+    standStill();
+  }
+  if(millis() >= time_2 + INTERVAL_MESSAGE2 && millis() < time_3 + INTERVAL_MESSAGE3)
+  {
+    turnRight(70);
+  }
+  if(millis() >= time_3 + INTERVAL_MESSAGE3 && millis() < time_4 + INTERVAL_MESSAGE4)
+  {
+    standStill();
+  }
+}
+
+void turn90LeftAdvanced() {
+  if(millis() < time_1 + INTERVAL_MESSAGE1)
+  {
+    driveForward(70);
+  }
+  if(millis() >= time_1 + INTERVAL_MESSAGE1 && millis() < time_2 + INTERVAL_MESSAGE2)
+  {
+    standStill();
+  }
+  if(millis() >= time_2 + INTERVAL_MESSAGE2 && millis() < time_3 + INTERVAL_MESSAGE3)
+  {
+    turnLeft(70);
+  }
+  if(millis() >= time_3 + INTERVAL_MESSAGE3 && millis() < time_4 + INTERVAL_MESSAGE4)
+  {
+    standStill();
+  }
+}
+
+
+/*
+ * --------------------------------------------------------------
+ * ---------------------------Loop-------------------------------
+ * --------------------------------------------------------------
+ */
+
 void mazeLoop() {
   //detect the different tapes.
   readPins();
@@ -121,81 +202,6 @@ void mazeLoop() {
   turn90LeftAdvanced();  
   }
   else
-  {
-    standStill();
-  }
-}
-
-
-/*
- * --------------------------------------------------------------
- * -------------------------Functions----------------------------
- * --------------------------------------------------------------
- */
-
- /*
- * Read the pins and give a colour
- */
-void readPins() {
-pinL = analogRead(IRPinL);
-pinR = analogRead(IRPinR);
-
-  if(pinR <= 90)  {
-    colourR = "white";
-  }else if(pinR > 80 && pinR <=400)  {
-    colourR = "grey";
-  }else if(pinR > 400) {
-    colourR = "black";
-  }
-
-  if(pinL <= 90)  {
-    colourL = "white";
-  }else if(pinL >85 && pinL <=400) {
-    colourL = "grey";
-  }else if(pinL >400)  {
-    colourL = "black";
-  }
-}
-
-
-/*
- * turn left 90
- */
-
-
-void turn90RightAdvanced() {
-  if(millis() < time_1 + INTERVAL_MESSAGE1)
-  {
-    driveForward(70);
-  }
-  if(millis() >= time_1 + INTERVAL_MESSAGE1 && millis() < time_2 + INTERVAL_MESSAGE2)
-  {
-    standStill();
-  }
-  if(millis() >= time_2 + INTERVAL_MESSAGE2 && millis() < time_3 + INTERVAL_MESSAGE3)
-  {
-    turnRight(70);
-  }
-  if(millis() >= time_3 + INTERVAL_MESSAGE3 && millis() < time_4 + INTERVAL_MESSAGE4)
-  {
-    standStill();
-  }
-}
-
-void turn90LeftAdvanced() {
-  if(millis() < time_1 + INTERVAL_MESSAGE1)
-  {
-    driveForward(70);
-  }
-  if(millis() >= time_1 + INTERVAL_MESSAGE1 && millis() < time_2 + INTERVAL_MESSAGE2)
-  {
-    standStill();
-  }
-  if(millis() >= time_2 + INTERVAL_MESSAGE2 && millis() < time_3 + INTERVAL_MESSAGE3)
-  {
-    turnLeft(70);
-  }
-  if(millis() >= time_3 + INTERVAL_MESSAGE3 && millis() < time_4 + INTERVAL_MESSAGE4)
   {
     standStill();
   }

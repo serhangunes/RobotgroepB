@@ -23,11 +23,11 @@ void raceLoop() {
     delay(500);
     //if robot sees black on the right then drive back for a moment, turn left and drive forward
   } else if (pinL == 0 && pinR >= 1) {
-    driveBackwards();
+    driveBackwards(100);
     turnLeft(80);
     //if robot sees black on the left then drive back for a moment, turn right and drive forward
   } else if (pinL >= 1 && pinR == 0) {
-    driveBackwards();
+    driveBackwards(100);
     turnRight(80);
     //if the robot sees no black then drive forward
   } else if (pinL == 0 && pinR == 0) {

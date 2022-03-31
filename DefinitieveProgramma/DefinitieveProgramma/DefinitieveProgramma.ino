@@ -17,6 +17,8 @@ const char* password = "vmzm9931"; //Het wachtwoord van het netwerk
 const char* ipadress = "battlebot1.serverict.nl"; //Het ip adres van de server
 const int port = 33003; //De poort waar de websocket op draait
 
+bool isPrepared = false;
+
 String currentGame = "idle"; //Variable voor het huidige spel
 String status = "ready"; //Variable voor de status van de robot
 bool isDriving = false; //De rijstatus van de robot
@@ -91,7 +93,7 @@ void loop() {
     //Voer dit elke 5 seconden uit
     webSocket.sendTXT("{\"status\": \"" + status + "\",\"isDriving\": " + isDriving + ",\"acceleration\":" + acceleration + "}");
   }
-  if(status == "in_game") {
+  if(status == "in_game" && isPrepared == true) {
     if(currentGame == "butler") {    
       //butlerLoop();
       driveForward(100);
@@ -103,7 +105,7 @@ void loop() {
       turnLeft(100);
     }
   }
-  if(status == "finished") {
+  if(status == "finished" || isPrepared == false) {
     standStill();
   }
 
@@ -163,6 +165,7 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
 
             //Stuur naar de websocket wanneer de arduino klaar is om het spel te starten
             webSocket.sendTXT("{\"status\": true,\"game\": \"" + game + "\"}");
+            isPrepared = true;
             status = "ready";
           }
         } else if (action == "start") {
@@ -175,6 +178,8 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
           Serial.println(game);
           status = "finished";
           currentGame = "idle";
+          isPrepared = false;
+          status = "ready";
         }
       }
       break;

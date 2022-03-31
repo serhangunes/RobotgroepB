@@ -36,7 +36,7 @@ void driveBackwards(double percentage) {
 
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, speedR);
-  analogWrite(motorPinLV, speedl);
+  analogWrite(motorPinLV, speedL);
   analogWrite(motorPinLA, 0);
 }
 
