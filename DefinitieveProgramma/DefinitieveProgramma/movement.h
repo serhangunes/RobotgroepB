@@ -77,34 +77,55 @@ void turnRightMaze(double percentage) {
   analogWrite(motorPinLV, speedL);
   analogWrite(motorPinLA, 0);
 }
-//void turn180()  {
-//  analogWrite(motorPinRA, 255);
-//  analogWrite(motorPinRV, 0);
-//  analogWrite(motorPinLV, 0);
-//  analogWrite(motorPinLA, 0);
-//  delay(1000);
-//}
 
-//
+void turn180Maze(double percentage)  {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((225.0f / 100.0f) * percentage);
+  analogWrite(motorPinRA, speedR);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, speedL);
+  analogWrite(motorPinLA, 0);
+  delay(600);
+}
+
 /*
- * turn 90 backwards
+ * turn 90 degrees backwards 
  */
-//void turn90Backwards()  {
-//  analogWrite(motorPinRA, 255);
-//  analogWrite(motorPinRV, 0);
-//  analogWrite(motorPinLV, 0);
-//  analogWrite(motorPinLA, 0);
-//  delay(500);
-//}
+void turn90Backwards(double percentage)  {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((225.0f / 100.0f) * percentage);
+  analogWrite(motorPinRA, 255);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, 0);
+  analogWrite(motorPinLA, 0);
+  delay(500);
+}
+
+/* 
+ *  turn left 90
+ */
+void turnRight90Maze() {
+    driveForward(70);
+    delay(100);
+    standStill();
+    delay(500);
+    turnRight(80);
+    delay(600);
+    standStill();
+    delay(500);
+}
 
 
-//void turnLeft90(double percentage) {
-//  int speedR = int((255.0f / 100.0f) * percentage);
-//  int speedL = int((255.0f / 100.0f) * percentage);
-//  analogWrite(motorPinRA, 0);
-//  analogWrite(motorPinRV, speedR);
-//  analogWrite(motorPinLV, 0);
-//  analogWrite(motorPinLA, 0);
-//  delay(600);
-//  standStill();
-//}
+/* 
+ *  turn right 90
+ */
+void turnLeft90Maze() {
+    driveForward(70);
+    delay(100);
+    standStill();
+    delay(500);
+    turnLeft(80);
+    delay(600);
+    standStill();
+    delay(500);
+}
