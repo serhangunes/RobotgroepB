@@ -12,10 +12,12 @@ Adafruit_SSD1306 display(128, 32, &Wire, 4); //Variable voor de display
 Adafruit_VL53L0X lidar = Adafruit_VL53L0X(); //Variable voor de LiDAR
 WebSocketsClient webSocket; //Variable voor de websocket
 
-const char* ssid = "Hotspot van Yannieck"; //De naam van het netwerk
-const char* password = "vmzm9931"; //Het wachtwoord van het netwerk
-const char* ipadress = "battlebot1.serverict.nl"; //Het ip adres van de server
-const int port = 33003; //De poort waar de websocket op draait
+const char* ssid = "iPhone XS van Steffan"; //De naam van het netwerk
+const char* password = "wachtwoord"; //Het wachtwoord van het netwerk
+const char* ipadress = "172.20.10.2"; //Het ip adres van de server
+const int port = 3003; //De poort waar de websocket op draait
+
+const String games[3] = {"butler", "maze", "race"};
 
 bool isPrepared = false;
 
@@ -23,7 +25,7 @@ String currentGame = "idle"; //Variable voor het huidige spel
 String status = "ready"; //Variable voor de status van de robot
 bool isDriving = false; //De rijstatus van de robot
 int acceleration = 0; //De acceleratie van de robot
- 
+
 unsigned long previousMillis = 0; //Te tijd sinds de laatst gemeten tijd
 const long interval = 5000; //De tijd die de loop moet wachten
 
@@ -44,11 +46,11 @@ void setup() {
 
   if (!lidar.begin()) {
     Serial.println(F("Failed to connect to VL53L0X"));
-    while(1);
+    while (1);
   }
-  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println(F("Failed to connect to SSD1306"));
-    for(;;); // Don't proceed, loop forever
+    for (;;); // Don't proceed, loop forever
   }
 
   Serial.begin(115200);
@@ -79,7 +81,7 @@ void setup() {
 }
 
 void loop() {
-  
+
   //Houd de websocket verbinding gaande
   webSocket.loop();
 
@@ -93,26 +95,28 @@ void loop() {
     //Voer dit elke 5 seconden uit
     webSocket.sendTXT("{\"status\": \"" + status + "\",\"isDriving\": " + isDriving + ",\"acceleration\":" + acceleration + "}");
   }
-  if(status == "in_game" && isPrepared == true) {
-    if(currentGame == "butler") {    
+  if (status == "in_game" && isPrepared == true) {
+
+    if (currentGame == games[0]) { //Butler
       //butlerLoop();
       driveForward(100);
-    } else if(currentGame == "race") {
-      //raceLoop();
-      driveBackwards(100);
-    } else if(currentGame == "maze") {
+    } else if (currentGame == games[1]) { //Maze
       //mazeLoop();
+      driveBackwards(100);
+    } else if (currentGame == games[2]) { //Race
+      //raceLoop();
       turnLeft(100);
     }
   }
-  if(status == "finished" || isPrepared == false) {
+
+  if (status == "finished" || isPrepared == false) {
     standStill();
   }
 
   display.clearDisplay();
-  display.setTextSize(2);             // Normal 1:1 pixel scale
+  display.setTextSize(1);             // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE);        // Draw white text
-  display.setCursor(0,0);             // Start at top-left corner
+  display.setCursor(0, 0);            // Start at top-left corner
   display.print("St: ");
   display.println(status);
   display.display();
@@ -121,7 +125,7 @@ void loop() {
 void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
   //status = "connecting to ws";
   //Maak een nieuw JSON bestand aan en sla de verkregen informatie er in op, haal daarna de waarden uit de JSON en stop ze in variabelen
-  
+
   const size_t capacity = JSON_OBJECT_SIZE(3);
   DynamicJsonDocument doc(capacity);
   deserializeJson(doc, payload);
@@ -150,39 +154,66 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
     case WStype_TEXT:
       //Wanneer er tekst is ontvangen:
       //Als er succesvol is ingelogd, stuur een bericht naar de serial monitor
+      Serial.print("[SERVER] ");
       Serial.println(test);
       if (loggedin) {
         Serial.println("[WS] Robot has logged in to the websocket");
       }
       //Als er een action is ontvangen, kijk wat die action is en print het naar de serial monitor
       if (action != "null") {
-        //Serial.println("[WS] Recieved info from websocket:");
-        if (action == "prepare") {
-          if (currentGame == "idle") {
-            Serial.print("[SERVER] prepare game: ");
-            Serial.println(game);
-            status = "preparing_game";
-
-            //Stuur naar de websocket wanneer de arduino klaar is om het spel te starten
-            webSocket.sendTXT("{\"status\": true,\"game\": \"" + game + "\"}");
-            isPrepared = true;
-            status = "ready";
+        bool validGame = false;
+        for (int i = 0; i < 3; i++) {
+          if (games[i] == game) {
+            validGame = true;
           }
-        } else if (action == "start") {
-          Serial.print("[SERVER] start game: ");
-          Serial.println(game);
-          status = "in_game";
-            currentGame = game;
-        } else if (action == "ended") {
-          Serial.print("[SERVER] ended game: ");
-          Serial.println(game);
-          status = "finished";
-          currentGame = "idle";
-          isPrepared = false;
-          status = "ready";
+        }
+        if (validGame == true) {
+          if (action == "prepare") {
+            if (currentGame == "idle") {
+              Serial.print("[SERVER] prepare game: ");
+              Serial.println(game);
+              status = "preparing_game";
+
+              //Stuur naar de websocket wanneer de arduino klaar is om het spel te starten
+              webSocket.sendTXT("{\"status\": true,\"game\": \"" + game + "\"}");
+              isPrepared = true;
+              status = "ready";
+            }
+          } else if (action == "start") {
+            if (isPrepared == true) {
+              Serial.print("[SERVER] start game: ");
+              Serial.println(game);
+              status = "in_game";
+              currentGame = game;
+            } else {
+              Serial.println("[ERROR] Cannot start " + game + ": not prepared");
+              webSocket.sendTXT("{\"error\": \"GAME_NOT_PREPARED\"}");
+            }
+          } else if (action == "ended") {
+            if (currentGame != "idle") {
+              if (currentGame == game) {
+                Serial.print("[SERVER] ended game: ");
+                Serial.println(currentGame);
+                status = "finished";
+                currentGame = "idle";
+                isPrepared = false;
+                status = "ready";
+              }
+            } else {
+              Serial.println("[ERROR] Er is geen spel gaande");
+            }
+          }
+        } else {
+          //Invalid game
+          Serial.println("[ERROR] Invalid game");
+          webSocket.sendTXT("{\"error\": \"GAME_NOT_FOUND\"}");
         }
       }
       break;
+    case WStype_PING:
+    //      Serial.println("ping");
+    case WStype_PONG:
+    //      Serial.println("pong");
     case WStype_BIN:
     case WStype_ERROR:
     case WStype_FRAGMENT_TEXT_START:
