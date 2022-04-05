@@ -42,12 +42,12 @@ void lookForHole() {
   display.display();
   delay(2000);
 
-  float dist = 0;
+  float dist = measure();
   do {
     dist = measure();
     turnLeft(70);
     canCheck = false;
-  } while (dist >= highestValue - 5 && dist <= highestValue + 5);
+  } while (dist >= (highestValue - 5) && dist <= (highestValue + 5));
 
   driveForward(80);
   canCheck = true;

@@ -8,6 +8,8 @@ float motorL = 255.0f;
 
 void writeToDisplay(String text, int x, int y) {
   display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
   display.setCursor(x, y);
   display.println(text);
   display.display();

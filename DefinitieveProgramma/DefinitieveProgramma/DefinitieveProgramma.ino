@@ -31,11 +31,12 @@ const long interval = 5000; //loop timer
 
 int IRPinR = 34; //right IR sensor
 int IRPinL = 39; //left IR sensor
-int pinR;
-int pinL;
+int IRValR;
+int IRValL;
 
 #include "functions.h" //import motor functions
-#include "butlerspelen.h" //import butler game
+//#include "butlerspelen.h" //import butler game
+#include "butlernieuw.h" //import butler game 2
 #include "race.h" //import race game
 #include "doolhof.h" //import maze game
 
@@ -53,10 +54,6 @@ void setup() {
     Serial.println(F("Failed to connect to SSD1306 (display)"));
     while (1);
   }
-  
-  //Initialize the display
-  display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
 
   //Connect to the WiFi network. try 10 times, else restart device
   WiFi.begin(ssid, password);
@@ -91,6 +88,9 @@ void setup() {
 void loop() {
   //Keep the websocket active
   webSocket.loop();
+  
+  IRValL = analogRead(IRPinL);
+  IRValR = analogRead(IRPinR);
 
   //Send websocket the robot info every [interval] milliseconds
   unsigned long currentMillis = millis();
