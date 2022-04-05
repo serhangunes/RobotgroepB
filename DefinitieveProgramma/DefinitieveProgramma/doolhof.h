@@ -1,6 +1,10 @@
 //declaring the variables
 String colourR = "";
 String colourL = "";
+
+int whiteVal = 100;
+int grayVal = 1000;
+
 /*
    --------------------------------------------------------------
    -------------------------Functions----------------------------
@@ -30,24 +34,24 @@ pinL = analogRead(IRPinL);
 pinR = analogRead(IRPinR);
 
 //if the sensor reads less than 80 it's white.
-  if(pinR <= 80)  {
+  if(pinR <= whiteVal)  {
     colourR = "white";
 //if the sensor read more than 80 and less than 250 it's grey.
-  }else if(pinR > 80 && pinR <=250)  {
+  }else if(pinR > whiteVal && pinR <=grayVal)  {
     colourR = "grey";
 //if the sensor reads more than 250 then it's black.
-  }else if(pinR > 250) {
+  }else if(pinR > grayVal) {
     colourR = "black";
   }
 
 //if the sensor reads less than 80 it's white.
-  if(pinL <= 85)  {
+  if(pinL <= whiteVal)  {
     colourL = "white";
 //if the sensor read more than 80 and less than 250 it's grey.
-  }else if(pinL >85 && pinL <=250) {
+  }else if(pinL >whiteVal && pinL <=grayVal) {
     colourL = "grey";
 //if the sensor reads more than 250 then it's black.
-  }else if(pinL >250)  {
+  }else if(pinL >grayVal)  {
     colourL = "black";
   }
 }
@@ -85,12 +89,12 @@ void mazeLoop() {
 //if left is grey then adjust to the left.
   else if(colourL == "grey" && colourR == "white") 
   {
-    turnLeft(70);
+    turnLeftMaze(70);
   }
 //if right is grey then adjust to the right.
   else if(colourL == "white" && colourR == "grey") 
   {
-    turnRight(70);
+    turnRightMaze(70);
   }
 //if right is black then turn 90 degrees to the right.
   else if(colourL == "white" && colourR == "black")

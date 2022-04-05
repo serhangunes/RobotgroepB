@@ -1,10 +1,17 @@
-int motorPinLA = 16;  //Rechterwiel achteruit
-int motorPinLV = 17;  //Rechterwiel vooruit
-int motorPinRV = 5;   //Linkerwiel vooruit
-int motorPinRA = 18;  //Linkerwiel achteruit
+int motorPinLV = 16;  //Rechterwiel achteruit
+int motorPinLA = 17;  //Rechterwiel vooruit
+int motorPinRA = 5;   //Linkerwiel vooruit
+int motorPinRV = 18;  //Linkerwiel achteruit
 
 float motorR = 255.0f;
 float motorL = 255.0f;
+
+void writeToDisplay(String text, int x, int y) {
+  display.clearDisplay();
+  display.setCursor(x, y);
+  display.println(text);
+  display.display();
+}
 
 void motorInit() {
   pinMode(motorPinRA, OUTPUT);
@@ -24,33 +31,23 @@ void driveForward(double percentage) {
   int speedR = int((motorR / 100.0f) * percentage);
   int speedL = int((motorL / 100.0f) * percentage);
 
-  analogWrite(motorPinRA, speedR);
-  analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, 0);
-  analogWrite(motorPinLA, speedL);
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, speedR);
+  analogWrite(motorPinLV, speedL);
+  analogWrite(motorPinLA, 0);
 }
 
 void driveBackwards(double percentage) {
   int speedR = int((motorR / 100.0f) * percentage);
   int speedL = int((motorL / 100.0f) * percentage);
 
-  analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, speedR);
-  analogWrite(motorPinLV, speedL);
-  analogWrite(motorPinLA, 0);
+  analogWrite(motorPinRA, speedR);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, 0);
+  analogWrite(motorPinLA, speedL);
 }
 
 void turnLeft(double percentage) {
-  int speedR = int((motorR / 100.0f) * percentage);
-  int speedL = int((motorL / 100.0f) * percentage);
-
-  analogWrite(motorPinRA, speedR);
-  analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, speedL);
-  analogWrite(motorPinLA, 0);
-}
-
-void turnRight(double percentage) {
   int speedR = int((motorR / 100.0f) * percentage);
   int speedL = int((motorL / 100.0f) * percentage);
 
@@ -58,6 +55,16 @@ void turnRight(double percentage) {
   analogWrite(motorPinRV, speedR);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, speedL);
+}
+
+void turnRight(double percentage) {
+  int speedR = int((motorR / 100.0f) * percentage);
+  int speedL = int((motorL / 100.0f) * percentage);
+
+  analogWrite(motorPinRA, speedR);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, speedL);
+  analogWrite(motorPinLA, 0);
 }
 
 void turnLeftMaze(double percentage) {
@@ -109,7 +116,7 @@ void turnRight90Maze() {
     delay(100);
     standStill();
     delay(500);
-    turnRight(80);
+    turnRightMaze(80);
     delay(600);
     standStill();
     delay(500);
@@ -124,7 +131,7 @@ void turnLeft90Maze() {
     delay(100);
     standStill();
     delay(500);
-    turnLeft(80);
+    turnLeftMaze(80);
     delay(600);
     standStill();
     delay(500);

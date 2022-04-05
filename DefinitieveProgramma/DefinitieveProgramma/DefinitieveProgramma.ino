@@ -1,131 +1,134 @@
 #include <Arduino.h>
-#include <WiFi.h> //De WiFi library
-#include <WebSocketsClient.h> //De websocket library
-#include <ArduinoJson.h> //De arduino JSON library
-#include <analogWrite.h> //De analogWrite library
+#include <WiFi.h> //WiFi library
+#include <WebSocketsClient.h> //websocket library
+#include <ArduinoJson.h> //arduino JSON library
+#include <analogWrite.h> //analogWrite library
 
-#include <Adafruit_VL53L0X.h> //De LiDAR library
-#include <Adafruit_GFX.h> //De graphics library
-#include <Adafruit_SSD1306.h> //De scherm library
+#include <Adafruit_VL53L0X.h> //liDAR library
+#include <Adafruit_GFX.h> //graphics library
+#include <Adafruit_SSD1306.h> //display library
 
-Adafruit_SSD1306 display(128, 32, &Wire, 4); //Variable voor de display
-Adafruit_VL53L0X lidar = Adafruit_VL53L0X(); //Variable voor de LiDAR
-WebSocketsClient webSocket; //Variable voor de websocket
+Adafruit_SSD1306 display(128, 32, &Wire, 4); //display variable
+Adafruit_VL53L0X lidar = Adafruit_VL53L0X(); //LiDAR variable
+WebSocketsClient webSocket; //websocket variable
 
-const char* ssid = "iPhone XS van Steffan"; //De naam van het netwerk
-const char* password = "wachtwoord"; //Het wachtwoord van het netwerk
-const char* ipadress = "172.20.10.2"; //Het ip adres van de server
-const int port = 3003; //De poort waar de websocket op draait
+const char* ssid = "Hotspot van Yannieck"; //network name
+const char* password = "vmzm9931"; //network password
+const char* ipadress = "battlebot1.serverict.nl"; //server ip-adress
+const int port = 33003; //websocket port
 
-const String games[3] = {"butler", "maze", "race"};
+const String games[3] = {"butler", "maze", "race"}; //the 3 games
 
-bool isPrepared = false;
+bool isPrepared = false; //robot is done preparing ? true : false
 
-String currentGame = "idle"; //Variable voor het huidige spel
-String status = "ready"; //Variable voor de status van de robot
-bool isDriving = false; //De rijstatus van de robot
+String currentGame = "idle"; //currently active game
+String botStatus = "ready"; //status variable
+bool isDriving = false; //driving status
 int acceleration = 0; //De acceleratie van de robot
 
-unsigned long previousMillis = 0; //Te tijd sinds de laatst gemeten tijd
-const long interval = 5000; //De tijd die de loop moet wachten
+unsigned long previousMillis = 0; //time since last measured time
+const long interval = 5000; //loop timer
 
-//declaring the pins
-int IRPinR = 34;
-int IRPinL = 39;
+int IRPinR = 34; //right IR sensor
+int IRPinL = 39; //left IR sensor
 int pinR;
 int pinL;
 
-#include "movement.h" //Importeer het bestand met de motor functies
-#include "butlerspelen.h" //Importeer het butlerspelen bestand
-#include "race.h" //Importeer het race bestand
-#include "doolhof.h" //Importeer het doolhof bestand
+#include "functions.h" //import motor functions
+#include "butlerspelen.h" //import butler game
+#include "race.h" //import race game
+#include "doolhof.h" //import maze game
 
 void setup() {
-  //Initialiseer het motor
-  motorInit();
-
+  //Start serial monitor
+  Serial.begin(115200);  
+  
+  //Initialize the lidar
   if (!lidar.begin()) {
-    Serial.println(F("Failed to connect to VL53L0X"));
+    Serial.println(F("Failed to connect to VL53L0X (LiDAR)"));
     while (1);
   }
+  //Initialize the display
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println(F("Failed to connect to SSD1306"));
-    for (;;); // Don't proceed, loop forever
+    Serial.println(F("Failed to connect to SSD1306 (display)"));
+    while (1);
   }
+  
+  //Initialize the display
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
 
-  Serial.begin(115200);
-
+  //Connect to the WiFi network. try 10 times, else restart device
   WiFi.begin(ssid, password);
+  
   int atempts = 0;
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.println("[WIFI] Connecting to WiFi..");
+    writeToDisplay("WiFI...", 0, 1);
     atempts++;
-
     if (atempts >= 10) {
       Serial.println("[WIFI] Restarting device");
       exit(0);
     }
   }
-
   Serial.println("[WIFI] Connected to the WiFi network");
+  writeToDisplay("Conn WiFI", 0, 1);
 
-  //Start de websocket met het ip, de poort en de URL
+  //Initialize the websocket. (ip, port, URL)
   webSocket.begin(ipadress, port, "/");
 
-  //Voer de event functie uit wanneer er iets gebeurt met de websocket
+  //Connect event function to the events
   webSocket.onEvent(webSocketEvent);
 
-  //Als ze websocket verbinding faalt, probeer met over 5s weer
+  //Try to reconnect every 5s when connection is lost
   webSocket.setReconnectInterval(5000);
+  
+  //initialize motor functions
+  motorInit();
 }
 
 void loop() {
-
-  //Houd de websocket verbinding gaande
+  //Keep the websocket active
   webSocket.loop();
 
-  //Stuur elke 5s de status van de robot
+  //Send websocket the robot info every [interval] milliseconds
   unsigned long currentMillis = millis();
-
   if (currentMillis - previousMillis >= interval) {
-    //Sla de laatste keer dat je dit heb uitgevoerd op
     previousMillis = currentMillis;
 
-    //Voer dit elke 5 seconden uit
-    webSocket.sendTXT("{\"status\": \"" + status + "\",\"isDriving\": " + isDriving + ",\"acceleration\":" + acceleration + "}");
+    //Execute this every [interval] milliseconds:
+    webSocket.sendTXT("{\"status\": \"" + botStatus + "\",\"isDriving\": " + isDriving + ",\"acceleration\":" + acceleration + "}");
   }
-  if (status == "in_game" && isPrepared == true) {
 
+  //When the robot is in a game and is fully ready, keep the game active
+  if (botStatus == "in_game" && isPrepared == true) {
     if (currentGame == games[0]) { //Butler
-      //butlerLoop();
-      driveForward(100);
+      butlerLoop();
+//      driveForward(100);
     } else if (currentGame == games[1]) { //Maze
-      //mazeLoop();
-      driveBackwards(100);
+      mazeLoop();
+//      driveBackwards(100);
     } else if (currentGame == games[2]) { //Race
-      //raceLoop();
-      turnLeft(100);
+      raceLoop();
+//      turnLeft(100);
     }
   }
 
-  if (status == "finished" || isPrepared == false) {
+  //If the bot has finished a game, stop the bot.
+  if (botStatus == "finished" || isPrepared == false) {
     standStill();
   }
 
-  display.clearDisplay();
-  display.setTextSize(1);             // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE);        // Draw white text
-  display.setCursor(0, 0);            // Start at top-left corner
-  display.print("St: ");
-  display.println(status);
-  display.display();
+  if(botStatus != "in_game") {
+    //Write the status to the display
+    writeToDisplay("St: " + botStatus, 0, 0);
+  }
 }
 
+//Execute this when something happens with the websocket
 void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
-  //status = "connecting to ws";
-  //Maak een nieuw JSON bestand aan en sla de verkregen informatie er in op, haal daarna de waarden uit de JSON en stop ze in variabelen
-
+  //Deserialize the json recieved from the websocket
   const size_t capacity = JSON_OBJECT_SIZE(3);
   DynamicJsonDocument doc(capacity);
   deserializeJson(doc, payload);
@@ -134,28 +137,25 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
   String action = doc["action"];
   String game = doc["game"];
 
-  char test[100];
-  serializeJson(doc, test);
+  char recievedMsg[100];
+  serializeJson(doc, recievedMsg);
 
   switch (type) {
     case WStype_CONNECTED:
-      //Wanneer er verbonden is met de websocket:
       Serial.println("[WS] Connected to the websocket");
-      //Vraag de server om in te loggen
       webSocket.sendTXT("{\"action\": \"login\",\"id\": \"" + WiFi.macAddress() + "\"}");
-      //status = "connected";
       break;
     case WStype_DISCONNECTED:
       //Wanneer de verbinding met de websocket is verbroken:
       Serial.println("[WS] Disconnected from the websocket");
       currentGame = "idle";
-      status = "ready";
+      botStatus = "ready";
       break;
     case WStype_TEXT:
       //Wanneer er tekst is ontvangen:
       //Als er succesvol is ingelogd, stuur een bericht naar de serial monitor
       Serial.print("[SERVER] ");
-      Serial.println(test);
+      Serial.println(recievedMsg);
       if (loggedin) {
         Serial.println("[WS] Robot has logged in to the websocket");
       }
@@ -172,21 +172,21 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
             if (currentGame == "idle") {
               Serial.print("[SERVER] prepare game: ");
               Serial.println(game);
-              status = "preparing_game";
+              botStatus = "preparing_game";
 
               //Stuur naar de websocket wanneer de arduino klaar is om het spel te starten
               webSocket.sendTXT("{\"status\": true,\"game\": \"" + game + "\"}");
               isPrepared = true;
-              status = "ready";
+              botStatus = "ready";
             }
           } else if (action == "start") {
             if (isPrepared == true) {
               Serial.print("[SERVER] start game: ");
               Serial.println(game);
-              status = "in_game";
+              botStatus = "in_game";
               currentGame = game;
             } else {
-              Serial.println("[ERROR] Cannot start " + game + ": not prepared");
+//              Serial.println("[ERROR] Cannot start " + game + ": not prepared");
               webSocket.sendTXT("{\"error\": \"GAME_NOT_PREPARED\"}");
             }
           } else if (action == "ended") {
@@ -194,10 +194,10 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
               if (currentGame == game) {
                 Serial.print("[SERVER] ended game: ");
                 Serial.println(currentGame);
-                status = "finished";
+                botStatus = "finished";
                 currentGame = "idle";
                 isPrepared = false;
-                status = "ready";
+                botStatus = "ready";
               }
             } else {
               Serial.println("[ERROR] Er is geen spel gaande");
@@ -211,9 +211,9 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
       }
       break;
     case WStype_PING:
-    //      Serial.println("ping");
+          Serial.println("ping");
     case WStype_PONG:
-    //      Serial.println("pong");
+          Serial.println("pong");
     case WStype_BIN:
     case WStype_ERROR:
     case WStype_FRAGMENT_TEXT_START:
