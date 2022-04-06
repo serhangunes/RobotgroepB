@@ -115,13 +115,13 @@ void turn90Backwards(double percentage)  {
  */
 void turnRight90Maze() {
     driveForward(70);
-    delay(100);
+    delay(200);
     standStill();
     delay(500);
     turnRightMaze(80);
     delay(600);
     standStill();
-    delay(500);
+    delay(1000);
 }
 
 
@@ -130,11 +130,11 @@ void turnRight90Maze() {
  */
 void turnLeft90Maze() {
     driveForward(70);
-    delay(100);
+    delay(250);
     standStill();
     delay(500);
     turnLeftMaze(80);
-    delay(600);
+    delay(650);
     standStill();
-    delay(500);
+    delay(1000);
 }

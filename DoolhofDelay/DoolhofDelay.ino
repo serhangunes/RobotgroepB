@@ -1,27 +1,38 @@
-//include libraries that we need.
 #include <Arduino.h>
-#include <analogWrite.h>
-#include <Adafruit_VL53L0X.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>  
-#include "WiFi.h"
+#include <WiFi.h> //WiFi library
+#include <WebSocketsClient.h> //websocket library
+#include <ArduinoJson.h> //arduino JSON library
+#include <analogWrite.h> //analogWrite library
 
-//declaring the pins
-int motorPinLV = 16;
-int motorPinLA = 17;
-int motorPinRV = 18;
-int motorPinRA = 5;
-int IRPinR = 34;
-int IRPinL = 39;
+#include <Adafruit_VL53L0X.h> //liDAR library
+#include <Adafruit_GFX.h> //graphics library
+#include <Adafruit_SSD1306.h> //display library
 
-//declaring the variables
-int pinR;
-int pinL;
-String colourR = "";
-String colourL = "";
+Adafruit_VL53L0X lidar = Adafruit_VL53L0X(); //LiDAR variable
 
 //declaring the screen.
 Adafruit_SSD1306 display(128, 64, &Wire, 4);
+
+
+int IRPinR = 34; //right IR sensor
+int IRPinL = 39; //left IR sensor
+int IRValR;
+int IRValL;
+
+int motorPinLV = 16;  //Rechterwiel achteruit
+int motorPinLA = 17;  //Rechterwiel vooruit
+int motorPinRA = 5;   //Linkerwiel vooruit
+int motorPinRV = 18;  //Linkerwiel achteruit
+
+float motorR = 255.0f;
+float motorL = 255.0f;
+
+//declaring the variables
+String colourR = "";
+String colourL = "";
+
+int whiteVal = 80;
+int grayVal = 400;
 
 void setup() {
 //setup display
@@ -45,76 +56,9 @@ void setup() {
 }
 
 void loop() {
-  //detect the different tapes.
-readPins();
+mazeLoop();
 
-/*
- * display
- */
-//clear the display
-  display.clearDisplay();
-
-//write the values from the IR sensor on the display
-  display.setCursor(0,0);             // Start at top-left corner
-  display.print("PinR: ");
-  display.println(pinR);
-  display.print("PinL: ");
-  display.println(pinL);
-  display.display();
-
-
-
-//this works for following the line of the maze.
-//If both are white then drive forward
-  if(colourL == "white" && colourR == "white")  
-  {
-    driveForward(70);
-  }
-//if left is grey then adjust to the left.
-  else if(colourL == "grey" && colourR == "white") 
-  {
-    turnLeft(70);
-  }
-//if right is grey then adjust to the right.
-  else if(colourL == "white" && colourR == "grey") 
-  {
-    turnRight(70);
-  }
-//if right is black then turn 90 degrees to the right.
-  else if(colourL == "white" && colourR == "black")
-  {
-    lookFunction();
-  }
-//if right is black then turn 90 degrees to the right.
-  else if(colourL == "grey" && colourR == "black")
-  {
-    lookFunction();
-  }
-//if both are grey then turn 180 degrees.
-  else if(colourL == "grey" && colourR == "grey")  
-  {
-    turn180(90);
-  }
-//if left is black then turn 90 degrees to the right.
-  else if(colourL == "black" && colourR == "white")
-  {
-    turnLeftAdvanced();
-  }
-//if left is black then turn 90 degrees to the right.
-  else if(colourL == "black" && colourR == "grey")
-  {
-    turnLeftAdvanced();   
-  }
-  else if(colourL == "black" && colourR == "black") {
-    turnLeftAdvanced();
-  }
-//else just stand still.
-  else
-  {
-    standStill();
-  }
 }
-
 
 /*
  * --------------------------------------------------------------
@@ -126,142 +70,128 @@ readPins();
  * Read the pins and give a colour
  */
 void readPins() {
-pinL = analogRead(IRPinL);
-pinR = analogRead(IRPinR);
-
+  IRValL = analogRead(IRPinL);
+  IRValR = analogRead(IRPinR);
 //if the sensor reads less than 80 it's white.
-  if(pinR <= 80)  {
+  if(IRValR <= whiteVal)  {
     colourR = "white";
 //if the sensor read more than 80 and less than 250 it's grey.
-  }else if(pinR > 80 && pinR <=250)  {
+  }else if(IRValR > whiteVal && IRValR <=grayVal)  {
     colourR = "grey";
 //if the sensor reads more than 250 then it's black.
-  }else if(pinR > 250) {
+  }else if(IRValR > grayVal) {
     colourR = "black";
   }
 
 //if the sensor reads less than 80 it's white.
-  if(pinL <= 85)  {
+  if(IRValL <= whiteVal)  {
     colourL = "white";
 //if the sensor read more than 80 and less than 250 it's grey.
-  }else if(pinL >85 && pinL <=250) {
+  }else if(IRValL >whiteVal && IRValL <=grayVal) {
     colourL = "grey";
 //if the sensor reads more than 250 then it's black.
-  }else if(pinL >250)  {
+  }else if(IRValL >grayVal)  {
     colourL = "black";
   }
 }
 
-void driveForward(double percentage) {
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((255.0f / 100.0f) * percentage);
-  
-  analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, speedR);
-  analogWrite(motorPinLV, speedL);
-  analogWrite(motorPinLA, 0);
+void writeToDisplay(String text, int x, int y) {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(x, y);
+  display.println(text);
+  display.display();
 }
 
-/*
- * Stand still
- */
+void motorInit() {
+  pinMode(motorPinRA, OUTPUT);
+  pinMode(motorPinRV, OUTPUT);
+  pinMode(motorPinLV, OUTPUT);
+  pinMode(motorPinLA, OUTPUT);
+}
 
 void standStill() {
-  analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 0);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, 0);
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, 0);
 }
 
-/*
- * turn left
- */
+void driveForward(double percentage) {
+  int speedR = int((motorR / 100.0f) * percentage);
+  int speedL = int((motorL / 100.0f) * percentage);
 
-void turnLeft(double percentage) {
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((255.0f / 100.0f) * percentage);
-  
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, speedR);
-  analogWrite(motorPinLV, 0);
-  analogWrite(motorPinLA, 0);
-}
-
-/*
- * turn right
- */
-
-void turnRight(double percentage) {
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((255.0f / 100.0f) * percentage);
-  
-  analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 0);
   analogWrite(motorPinLV, speedL);
   analogWrite(motorPinLA, 0);
 }
 
-/*
- * turn left 90
- */
+void driveBackwards(double percentage) {
+  int speedR = int((motorR / 100.0f) * percentage);
+  int speedL = int((motorL / 100.0f) * percentage);
 
-void turnLeft90(double percentage) {
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((255.0f / 100.0f) * percentage);
-  analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, speedR);
-  analogWrite(motorPinLV, 0);
-  analogWrite(motorPinLA, 0);
-  delay(600);
-  standStill();
-}
-
-/*
- * turn right 90
- */
-
-void turnRight90(double percentage)  {
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((255.0f / 100.0f) * percentage);
-  analogWrite(motorPinRA, 0);
-  analogWrite(motorPinRV, 0);
-  analogWrite(motorPinLV, speedL);
-  analogWrite(motorPinLA, 0);
-  delay(600);
-  standStill();
-}
-
-/*
- * drive backwards
- */
-
-void driveBackwards(double percentage){
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((225.0f / 100.0f) * percentage);
-  
   analogWrite(motorPinRA, speedR);
   analogWrite(motorPinRV, 0);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, speedL);
 }
 
-/*
- * turn 180
- */
-void turn180(double percentage)  {
-  int speedR = int((255.0f / 100.0f) * percentage);
-  int speedL = int((225.0f / 100.0f) * percentage);
+void turnLeft(double percentage) {
+  int speedR = int((motorR / 100.0f) * percentage);
+  int speedL = int((motorL / 100.0f) * percentage);
+
   analogWrite(motorPinRA, 0);
   analogWrite(motorPinRV, speedR);
   analogWrite(motorPinLV, 0);
   analogWrite(motorPinLA, speedL);
+}
+
+void turnRight(double percentage) {
+  int speedR = int((motorR / 100.0f) * percentage);
+  int speedL = int((motorL / 100.0f) * percentage);
+
+  analogWrite(motorPinRA, speedR);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, speedL);
+  analogWrite(motorPinLA, 0);
+}
+
+void turnLeftMaze(double percentage) {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((255.0f / 100.0f) * percentage);
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, speedR);
+  analogWrite(motorPinLV, 0);
+  analogWrite(motorPinLA, 0);
+}
+
+void turnRightMaze(double percentage) {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((255.0f / 100.0f) * percentage);
+  analogWrite(motorPinRA, 0);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, speedL);
+  analogWrite(motorPinLA, 0);
+}
+
+void turn180Maze(double percentage)  {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((225.0f / 100.0f) * percentage);
+  analogWrite(motorPinRA, speedR);
+  analogWrite(motorPinRV, 0);
+  analogWrite(motorPinLV, speedL);
+  analogWrite(motorPinLA, 0);
   delay(600);
 }
 
 /*
- * turn 90 backwards
+ * turn 90 degrees backwards 
  */
-void turn90Backwards()  {
+void turn90Backwards(double percentage)  {
+  int speedR = int((255.0f / 100.0f) * percentage);
+  int speedL = int((225.0f / 100.0f) * percentage);
   analogWrite(motorPinRA, 255);
   analogWrite(motorPinRV, 0);
   analogWrite(motorPinLV, 0);
@@ -272,43 +202,97 @@ void turn90Backwards()  {
 /* 
  *  turn left 90
  */
-void turnRightAdvanced() {
+void turnRight90Maze() {
     driveForward(70);
-    delay(100);
+    delay(200);
     standStill();
     delay(500);
-    turnRight(80);
+    turnRightMaze(80);
     delay(600);
     standStill();
-    delay(500);
+    delay(1000);
 }
 
 
 /* 
  *  turn right 90
  */
-void turnLeftAdvanced() {
+void turnLeft90Maze() {
     driveForward(70);
-    delay(100);
+    delay(250);
     standStill();
     delay(500);
-    turnLeft(80);
-    delay(600);
+    turnLeftMaze(80);
+    delay(650);
     standStill();
-    delay(500);
+    delay(1000);
 }
 
-/*
- * Look if there is a road ahead.
- */
-void lookFunction() {
-  turnRightAdvanced();
-  driveBackwards(70);
-  if(colourL == "black" && colourR == "black")  {
-    standStill();
-    delay(500);
-    turnLeftAdvanced();
-  }else{
+void mazeLoop() {
+  //detect the different tapes.
+  readPins();
+
+  /*
+   * display
+   */
+  //clear the display
+  display.clearDisplay();
+
+  //write the values from the IR sensor on the display
+  display.setCursor(0, 0);            // Start at top-left corner
+  display.print("PinR: ");
+  display.println(IRValR);
+  display.print("PinL: ");
+  display.println(IRValL);
+  display.display();
+
+//this works for following the line of the maze.
+//If both are white then drive forward
+  if(colourL == "white" && colourR == "white")  
+  {
     driveForward(70);
+  }
+//if left is grey then adjust to the left.
+  else if(colourL == "grey" && colourR == "white") 
+  {
+    turnLeftMaze(70);
+  }
+//if right is grey then adjust to the right.
+  else if(colourL == "white" && colourR == "grey") 
+  {
+    turnRightMaze(70);
+  }
+//if right is black then turn 90 degrees to the right.
+  else if(colourL == "white" && colourR == "black")
+  {
+    turnRight90Maze();
+  }
+//if right is black then turn 90 degrees to the right.
+  else if(colourL == "grey" && colourR == "black")
+  {
+    turnRight90Maze();
+  }
+//if both are grey then turn 180 degrees.
+  else if(colourL == "grey" && colourR == "grey")  
+  {
+    standStill();
+  }
+//if left is black then turn 90 degrees to the right.
+  else if(colourL == "black" && colourR == "white")
+  {
+    turnLeft90Maze();
+  }
+//if left is black then turn 90 degrees to the right.
+  else if(colourL == "black" && colourR == "grey")
+  {
+    turnLeft90Maze();   
+  }
+  else if(colourL == "black" && colourR == "black") {
+    turnRight90Maze();
+  }
+//else just stand still.
+  else
+  {
+    standStill();
   }
 }

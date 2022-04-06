@@ -2,8 +2,8 @@
 String colourR = "";
 String colourL = "";
 
-int whiteVal = 100;
-int grayVal = 1000;
+int whiteVal = 80;
+int grayVal = 400;
 
 /*
    --------------------------------------------------------------
@@ -15,12 +15,12 @@ int grayVal = 1000;
  * Look if there is a road ahead.
  */
 void lookFunction() {
-  turnRight90Maze();
+  turnLeft90Maze();
   driveBackwards(70);
   if(colourL == "black" && colourR == "black")  {
     standStill();
     delay(500);
-    turnLeft90Maze();
+    turnRight90Maze();
   }else{
     driveForward(70);
   }
@@ -97,17 +97,17 @@ void mazeLoop() {
 //if right is black then turn 90 degrees to the right.
   else if(colourL == "white" && colourR == "black")
   {
-    lookFunction();
+    turnRight90Maze();
   }
 //if right is black then turn 90 degrees to the right.
   else if(colourL == "grey" && colourR == "black")
   {
-    lookFunction();
+    turnRight90Maze();
   }
 //if both are grey then turn 180 degrees.
   else if(colourL == "grey" && colourR == "grey")  
   {
-    turn180Maze(90);
+    standStill();
   }
 //if left is black then turn 90 degrees to the right.
   else if(colourL == "black" && colourR == "white")
@@ -120,7 +120,7 @@ void mazeLoop() {
     turnLeft90Maze();   
   }
   else if(colourL == "black" && colourR == "black") {
-    turnLeft90Maze();
+    turnRight90Maze();
   }
 //else just stand still.
   else
