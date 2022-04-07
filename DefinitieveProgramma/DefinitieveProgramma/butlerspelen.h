@@ -1,77 +1,48 @@
 bool canCheck = true;
+int valCap = 50;
 
 float measure() {
   VL53L0X_RangingMeasurementData_t measure;
   lidar.rangingTest(&measure, false);
   float dist = measure.RangeMilliMeter / 10.0f - 2.0f;
-
   return dist;
 }
 
 void lookForHole() {
-  float highestValue = 0;
-  canCheck = false;
-
-  turnLeft(70);
-  delay(400);
-  standStill();
-  delay(400);
-  for (int i = 0; i < 8; i++) {
-    turnRight(70);
-    delay(100);
-
-    float dist = measure();
-    standStill();
-    if (dist > highestValue) {
-      highestValue = dist;
-    }
-    display.clearDisplay();
-    display.setCursor(0, 1);
-    display.print(i);
-    display.print(": ");
-    display.println(dist);
-    display.display();
-    delay(500);
-  }
-
-  standStill();
-  display.clearDisplay();
-  display.setCursor(0, 1);
-  display.print("h: ");
-  display.println(highestValue);
-  display.display();
-  delay(2000);
-
   float dist = measure();
+  canCheck = false;
+  turnLeft(60);
+  delay(400);
+
   do {
     dist = measure();
-    turnLeft(70);
-    canCheck = false;
-  } while (dist >= (highestValue - 5) && dist <= (highestValue + 5));
+    turnRight(60);
+  } while (dist < valCap);
+  standStill();
 
-  driveForward(80);
+  delay(500);
+
+  driveForward(60);
+
   canCheck = true;
 }
 
 void butlerLoop() {
   VL53L0X_RangingMeasurementData_t measure;
   lidar.rangingTest(&measure, false);
-
-  //Afstand in cm
   float dist = measure.RangeMilliMeter / 10.0f - 2.0f;
 
   if (measure.RangeStatus != 4) {
-    display.clearDisplay();
-    display.setCursor(0, 1);
-    display.print("d: ");
-    display.println(dist);
-    display.display();
+    writeToDisplay("d: " + String(dist), 0, 0);
+    writeToDisplay("L: " + String(IRValL) + " R: " + String(IRValR), 0, 1);
     if (dist <= 30.0f && canCheck == true) {
       standStill();
-      delay(1000);
       lookForHole();
     } else {
       driveForward(80);
     }
   }
+//  if (IRValL >= 2000 && IRValR >= 2000) {
+//    botStatus = "finished";
+//  }
 }

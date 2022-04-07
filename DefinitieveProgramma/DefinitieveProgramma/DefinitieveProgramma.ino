@@ -12,10 +12,10 @@ Adafruit_SSD1306 display(128, 32, &Wire, 4); //display variable
 Adafruit_VL53L0X lidar = Adafruit_VL53L0X(); //LiDAR variable
 WebSocketsClient webSocket; //websocket variable
 
-const char* ssid = "Hotspot van Yannieck"; //network name
-const char* password = "vmzm9931"; //network password
-const char* ipadress = "battlebot1.serverict.nl"; //server ip-adress
-const int port = 33003; //websocket port
+const char* ssid = ""; //network name
+const char* password = ""; //network password
+const char* ipadress = ""; //server ip-adress
+const int port = 0; //websocket port
 
 const String games[3] = {"butler", "maze", "race"}; //the 3 games
 
@@ -35,8 +35,7 @@ int IRValR;
 int IRValL;
 
 #include "functions.h" //import motor functions
-//#include "butlerspelen.h" //import butler game
-#include "butlernieuw.h" //import butler game 2
+#include "butlerspelen.h" //import butler game
 #include "race.h" //import race game
 #include "doolhof.h" //import maze game
 
@@ -83,6 +82,8 @@ void setup() {
   
   //initialize motor functions
   motorInit();
+
+  Serial.println(WiFi.macAddress());
 }
 
 void loop() {
@@ -105,13 +106,10 @@ void loop() {
   if (botStatus == "in_game" && isPrepared == true) {
     if (currentGame == games[0]) { //Butler
       butlerLoop();
-//      driveForward(100);
     } else if (currentGame == games[1]) { //Maze
       mazeLoop();
-//      driveBackwards(100);
     } else if (currentGame == games[2]) { //Race
       raceLoop();
-//      turnLeft(100);
     }
   }
 
@@ -186,7 +184,7 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
               botStatus = "in_game";
               currentGame = game;
             } else {
-//              Serial.println("[ERROR] Cannot start " + game + ": not prepared");
+              Serial.println("[ERROR] Cannot start " + game + ": not prepared");
               webSocket.sendTXT("{\"error\": \"GAME_NOT_PREPARED\"}");
             }
           } else if (action == "ended") {
@@ -211,9 +209,9 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
       }
       break;
     case WStype_PING:
-          Serial.println("ping");
+          Serial.println("[SERVER] ping");
     case WStype_PONG:
-          Serial.println("pong");
+          Serial.println("[BOT] pong");
     case WStype_BIN:
     case WStype_ERROR:
     case WStype_FRAGMENT_TEXT_START:
