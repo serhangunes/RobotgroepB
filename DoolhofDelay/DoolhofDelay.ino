@@ -31,8 +31,10 @@ float motorL = 255.0f;
 String colourR = "";
 String colourL = "";
 
-int whiteVal = 80;
-int grayVal = 400;
+int whiteValL = 80;
+int whiteValR = 65;
+int greyValL = 200;
+int greyValR = 200;
 
 void setup() {
 //setup display
@@ -73,24 +75,24 @@ void readPins() {
   IRValL = analogRead(IRPinL);
   IRValR = analogRead(IRPinR);
 //if the sensor reads less than 80 it's white.
-  if(IRValR <= whiteVal)  {
+  if(IRValR <= whiteValR)  {
     colourR = "white";
 //if the sensor read more than 80 and less than 250 it's grey.
-  }else if(IRValR > whiteVal && IRValR <=grayVal)  {
+  }else if(IRValR > whiteValR && IRValR <=greyValR)  {
     colourR = "grey";
 //if the sensor reads more than 250 then it's black.
-  }else if(IRValR > grayVal) {
+  }else if(IRValR > greyValR) {
     colourR = "black";
   }
 
 //if the sensor reads less than 80 it's white.
-  if(IRValL <= whiteVal)  {
+  if(IRValL <= whiteValL)  {
     colourL = "white";
 //if the sensor read more than 80 and less than 250 it's grey.
-  }else if(IRValL >whiteVal && IRValL <=grayVal) {
+  }else if(IRValL >whiteValL && IRValL <=greyValL) {
     colourL = "grey";
 //if the sensor reads more than 250 then it's black.
-  }else if(IRValL >grayVal)  {
+  }else if(IRValL >greyValL)  {
     colourL = "black";
   }
 }
@@ -203,7 +205,7 @@ void turn90Backwards(double percentage)  {
  *  turn left 90
  */
 void turnRight90Maze() {
-    driveForward(70);
+    driveForward(80);
     delay(200);
     standStill();
     delay(500);
@@ -218,7 +220,7 @@ void turnRight90Maze() {
  *  turn right 90
  */
 void turnLeft90Maze() {
-    driveForward(70);
+    driveForward(80);
     delay(250);
     standStill();
     delay(500);
@@ -250,17 +252,17 @@ void mazeLoop() {
 //If both are white then drive forward
   if(colourL == "white" && colourR == "white")  
   {
-    driveForward(70);
+    driveForward(80);
   }
 //if left is grey then adjust to the left.
   else if(colourL == "grey" && colourR == "white") 
   {
-    turnLeftMaze(70);
+    turnLeftMaze(80);
   }
 //if right is grey then adjust to the right.
   else if(colourL == "white" && colourR == "grey") 
   {
-    turnRightMaze(70);
+    turnRightMaze(80);
   }
 //if right is black then turn 90 degrees to the right.
   else if(colourL == "white" && colourR == "black")
