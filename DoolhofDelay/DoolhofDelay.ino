@@ -32,7 +32,7 @@ String colourR = "";
 String colourL = "";
 
 int whiteValL = 80;
-int whiteValR = 65;
+int whiteValR = 80;
 int greyValL = 200;
 int greyValR = 200;
 
