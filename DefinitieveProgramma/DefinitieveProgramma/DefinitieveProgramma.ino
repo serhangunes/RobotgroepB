@@ -90,6 +90,7 @@ void loop() {
   //Keep the websocket active
   webSocket.loop();
 
+  //Read the IR sensors
   IRValL = analogRead(IRPinL);
   IRValR = analogRead(IRPinR);
 
@@ -117,9 +118,9 @@ void loop() {
   if (botStatus == "finished" || isPrepared == false) {
     standStill();
   }
-
+  
+  //Write the status to the display
   if (botStatus != "in_game") {
-    //Write the status to the display
     writeToDisplay("St: " + botStatus, 0, 0);
   }
 }
@@ -131,33 +132,36 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
   DynamicJsonDocument doc(capacity);
   deserializeJson(doc, payload);
 
+  //Put the recieved values in variables
   bool loggedin = doc["loggedin"];
   String action = doc["action"];
   String game = doc["game"];
 
+  //Make the recieved values a string so it is printable
   char recievedMsg[100];
   serializeJson(doc, recievedMsg);
 
   switch (type) {
+    //When connected with the websocket:
     case WStype_CONNECTED:
       Serial.println("[WS] Connected to the websocket");
       webSocket.sendTXT("{\"action\": \"login\",\"id\": \"" + WiFi.macAddress() + "\"}");
       break;
+    //When disconnected from the websocket
     case WStype_DISCONNECTED:
-      //Wanneer de verbinding met de websocket is verbroken:
       Serial.println("[WS] Disconnected from the websocket");
       currentGame = "idle";
       botStatus = "ready";
       break;
+    //Upon receiving text:
     case WStype_TEXT:
-      //Wanneer er tekst is ontvangen:
-      //Als er succesvol is ingelogd, stuur een bericht naar de serial monitor
       Serial.print("[SERVER] ");
       Serial.println(recievedMsg);
+      
       if (loggedin) {
         Serial.println("[WS] Robot has logged in to the websocket");
       }
-      //Als er een action is ontvangen, kijk wat die action is en print het naar de serial monitor
+      //if something is recieved from the server:
       if (action != "null") {
         bool validGame = false;
         for (int i = 0; i < 3; i++) {
@@ -172,12 +176,13 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
               Serial.println(game);
               botStatus = "preparing_game";
 
-              //Stuur naar de websocket wanneer de arduino klaar is om het spel te starten
+              //Send the server a message when it's ready
               webSocket.sendTXT("{\"status\": true,\"game\": \"" + game + "\"}");
               isPrepared = true;
               botStatus = "ready";
             }
           } else if (action == "start") {
+            //Start the game when the server tells the bot to start
             if (isPrepared == true) {
               Serial.print("[SERVER] start game: ");
               Serial.println(game);
@@ -188,6 +193,7 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
               webSocket.sendTXT("{\"error\": \"GAME_NOT_PREPARED\"}");
             }
           } else if (action == "ended") {
+            //End the game when the server tells the bot to stop
             if (currentGame != "idle") {
               if (currentGame == game) {
                 Serial.print("[SERVER] ended game: ");
