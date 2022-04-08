@@ -100,12 +100,12 @@ void mazeLoop() {
   {
     turnRightMaze(70);
   }
-  //if right is black then turn 90 degrees to the right.
+  //if right is black then look if there is a road ahead.
   else if (colourL == "white" && colourR == "black")
   {
     turnRight90Maze();
   }
-  //if right is black then turn 90 degrees to the right.
+  //if right is black then look if there is a road ahead.
   else if (colourL == "grey" && colourR == "black")
   {
     turnRight90Maze();
@@ -118,12 +118,12 @@ void mazeLoop() {
   //if left is black then turn 90 degrees to the right.
   else if (colourL == "black" && colourR == "white")
   {
-    turnLeft90Maze();
+    lookFunction();
   }
   //if left is black then turn 90 degrees to the right.
   else if (colourL == "black" && colourR == "grey")
   {
-    turnLeft90Maze();
+    lookFunction();
   }
   else if (colourL == "black" && colourR == "black") {
     turnRight90Maze();
