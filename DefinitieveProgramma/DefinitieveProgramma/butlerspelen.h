@@ -42,7 +42,7 @@ void butlerLoop() {
       driveForward(80);
     }
   }
-  //  if (IRValL >= 2000 && IRValR >= 2000) {
-  //    botStatus = "finished";
-  //  }
+  if (IRValL >= 2000 && IRValR >= 2000) {
+    botStatus = "finished";
+  }
 }
