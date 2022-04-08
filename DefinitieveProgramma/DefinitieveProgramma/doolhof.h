@@ -2,8 +2,10 @@
 String colourR = "";
 String colourL = "";
 
-int whiteVal = 80;
-int grayVal = 400;
+int whiteValL = 80;
+int whiteValR = 80;
+int greyValL = 200;
+int greyValR = 200;
 
 /*
    --------------------------------------------------------------
@@ -12,16 +14,16 @@ int grayVal = 400;
 */
 
 /*
- * Look if there is a road ahead.
- */
+   Look if there is a road ahead.
+*/
 void lookFunction() {
   turnLeft90Maze();
   driveBackwards(70);
-  if(colourL == "black" && colourR == "black")  {
+  if (colourL == "black" && colourR == "black")  {
     standStill();
     delay(500);
     turnRight90Maze();
-  }else{
+  } else {
     driveForward(70);
   }
 }
@@ -31,42 +33,42 @@ void lookFunction() {
 */
 void readPins() {
 
-//if the sensor reads less than 80 it's white.
-  if(IRValR <= whiteVal)  {
+  //if the sensor reads less than 80 it's white.
+  if (IRValR <= whiteValR)  {
     colourR = "white";
-//if the sensor read more than 80 and less than 250 it's grey.
-  }else if(IRValR > whiteVal && IRValR <=grayVal)  {
+    //if the sensor read more than 80 and less than 250 it's grey.
+  } else if (IRValR > whiteValR && IRValR <= greyValR)  {
     colourR = "grey";
-//if the sensor reads more than 250 then it's black.
-  }else if(IRValR > grayVal) {
+    //if the sensor reads more than 250 then it's black.
+  } else if (IRValR > greyValR) {
     colourR = "black";
   }
 
-//if the sensor reads less than 80 it's white.
-  if(IRValL <= whiteVal)  {
+  //if the sensor reads less than 80 it's white.
+  if (IRValL <= whiteValL)  {
     colourL = "white";
-//if the sensor read more than 80 and less than 250 it's grey.
-  }else if(IRValL >whiteVal && IRValL <=grayVal) {
+    //if the sensor read more than 80 and less than 250 it's grey.
+  } else if (IRValL > whiteValL && IRValL <= greyValL) {
     colourL = "grey";
-//if the sensor reads more than 250 then it's black.
-  }else if(IRValL >grayVal)  {
+    //if the sensor reads more than 250 then it's black.
+  } else if (IRValL > greyValL)  {
     colourL = "black";
   }
 }
 
 /*
- * --------------------------------------------------------------
- * ---------------------------Maze-------------------------------
- * --------------------------------------------------------------
- */
+   --------------------------------------------------------------
+   ---------------------------Maze-------------------------------
+   --------------------------------------------------------------
+*/
 
 void mazeLoop() {
   //detect the different tapes.
   readPins();
 
   /*
-   * display
-   */
+     display
+  */
   //clear the display
   display.clearDisplay();
 
@@ -78,51 +80,51 @@ void mazeLoop() {
   display.println(IRValL);
   display.display();
 
-//this works for following the line of the maze.
-//If both are white then drive forward
-  if(colourL == "white" && colourR == "white")  
+  //this works for following the line of the maze.
+  //If both are white then drive forward
+  if (colourL == "white" && colourR == "white")
   {
     driveForward(70);
   }
-//if left is grey then adjust to the left.
-  else if(colourL == "grey" && colourR == "white") 
+  //if left is grey then adjust to the left.
+  else if (colourL == "grey" && colourR == "white")
   {
     turnLeftMaze(70);
   }
-//if right is grey then adjust to the right.
-  else if(colourL == "white" && colourR == "grey") 
+  //if right is grey then adjust to the right.
+  else if (colourL == "white" && colourR == "grey")
   {
     turnRightMaze(70);
   }
-//if right is black then turn 90 degrees to the right.
-  else if(colourL == "white" && colourR == "black")
+  //if right is black then turn 90 degrees to the right.
+  else if (colourL == "white" && colourR == "black")
   {
     turnRight90Maze();
   }
-//if right is black then turn 90 degrees to the right.
-  else if(colourL == "grey" && colourR == "black")
+  //if right is black then turn 90 degrees to the right.
+  else if (colourL == "grey" && colourR == "black")
   {
     turnRight90Maze();
   }
-//if both are grey then turn 180 degrees.
-  else if(colourL == "grey" && colourR == "grey")  
+  //if both are grey then turn 180 degrees.
+  else if (colourL == "grey" && colourR == "grey")
   {
-    standStill();
+    turn180Maze(70);
   }
-//if left is black then turn 90 degrees to the right.
-  else if(colourL == "black" && colourR == "white")
+  //if left is black then turn 90 degrees to the right.
+  else if (colourL == "black" && colourR == "white")
   {
     turnLeft90Maze();
   }
-//if left is black then turn 90 degrees to the right.
-  else if(colourL == "black" && colourR == "grey")
+  //if left is black then turn 90 degrees to the right.
+  else if (colourL == "black" && colourR == "grey")
   {
-    turnLeft90Maze();   
+    turnLeft90Maze();
   }
-  else if(colourL == "black" && colourR == "black") {
+  else if (colourL == "black" && colourR == "black") {
     turnRight90Maze();
   }
-//else just stand still.
+  //else just stand still.
   else
   {
     standStill();

@@ -98,8 +98,8 @@ void turn180Maze(double percentage)  {
 }
 
 /*
- * turn 90 degrees backwards 
- */
+   turn 90 degrees backwards
+*/
 void turn90Backwards(double percentage)  {
   int speedR = int((255.0f / 100.0f) * percentage);
   int speedL = int((225.0f / 100.0f) * percentage);
@@ -110,31 +110,31 @@ void turn90Backwards(double percentage)  {
   delay(500);
 }
 
-/* 
- *  turn left 90
- */
+/*
+    turn left 90
+*/
 void turnRight90Maze() {
-    driveForward(70);
-    delay(200);
-    standStill();
-    delay(500);
-    turnRightMaze(80);
-    delay(600);
-    standStill();
-    delay(1000);
+  driveForward(70);
+  delay(200);
+  standStill();
+  delay(500);
+  turnRightMaze(80);
+  delay(600);
+  standStill();
+  delay(1000);
 }
 
 
-/* 
- *  turn right 90
- */
+/*
+    turn right 90
+*/
 void turnLeft90Maze() {
-    driveForward(70);
-    delay(250);
-    standStill();
-    delay(500);
-    turnLeftMaze(80);
-    delay(650);
-    standStill();
-    delay(1000);
+  driveForward(70);
+  delay(250);
+  standStill();
+  delay(500);
+  turnLeftMaze(80);
+  delay(650);
+  standStill();
+  delay(1000);
 }

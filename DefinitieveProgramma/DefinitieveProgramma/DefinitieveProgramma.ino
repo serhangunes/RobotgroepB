@@ -41,8 +41,8 @@ int IRValL;
 
 void setup() {
   //Start serial monitor
-  Serial.begin(115200);  
-  
+  Serial.begin(115200);
+
   //Initialize the lidar
   if (!lidar.begin()) {
     Serial.println(F("Failed to connect to VL53L0X (LiDAR)"));
@@ -56,7 +56,7 @@ void setup() {
 
   //Connect to the WiFi network. try 10 times, else restart device
   WiFi.begin(ssid, password);
-  
+
   int atempts = 0;
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -79,7 +79,7 @@ void setup() {
 
   //Try to reconnect every 5s when connection is lost
   webSocket.setReconnectInterval(5000);
-  
+
   //initialize motor functions
   motorInit();
 
@@ -89,7 +89,7 @@ void setup() {
 void loop() {
   //Keep the websocket active
   webSocket.loop();
-  
+
   IRValL = analogRead(IRPinL);
   IRValR = analogRead(IRPinR);
 
@@ -118,7 +118,7 @@ void loop() {
     standStill();
   }
 
-  if(botStatus != "in_game") {
+  if (botStatus != "in_game") {
     //Write the status to the display
     writeToDisplay("St: " + botStatus, 0, 0);
   }
@@ -209,9 +209,9 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
       }
       break;
     case WStype_PING:
-          Serial.println("[SERVER] ping");
+      Serial.println("[SERVER] ping");
     case WStype_PONG:
-          Serial.println("[BOT] pong");
+      Serial.println("[BOT] pong");
     case WStype_BIN:
     case WStype_ERROR:
     case WStype_FRAGMENT_TEXT_START:
