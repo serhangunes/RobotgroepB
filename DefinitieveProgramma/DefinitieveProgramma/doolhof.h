@@ -2,6 +2,7 @@
 String colourR = "";
 String colourL = "";
 
+//Declaring the colours
 int whiteValL = 80;
 int whiteValR = 80;
 int greyValL = 200;
@@ -17,13 +18,16 @@ int greyValR = 200;
    Look if there is a road ahead.
 */
 void lookFunction() {
+  //turn left and drivebackward until they see black on both sides.
   turnLeft90Maze();
   driveBackwards(70);
   if (colourL == "black" && colourR == "black")  {
+    //stand still and turn right with 90 degrees if both sides are black.
     standStill();
     delay(500);
     turnRight90Maze();
   } else {
+    //drive forward if both sides are not black.
     driveForward(70);
   }
 }
@@ -33,24 +37,24 @@ void lookFunction() {
 */
 void readPins() {
 
-  //if the sensor reads less than 80 it's white.
+  //if the sensor reads less than the white value it's white.
   if (IRValR <= whiteValR)  {
     colourR = "white";
-    //if the sensor read more than 80 and less than 250 it's grey.
+    //if the sensor read more than the white value and less than the grey value it's grey.
   } else if (IRValR > whiteValR && IRValR <= greyValR)  {
     colourR = "grey";
-    //if the sensor reads more than 250 then it's black.
+    //if the sensor reads more than the grey value then it's black.
   } else if (IRValR > greyValR) {
     colourR = "black";
   }
 
-  //if the sensor reads less than 80 it's white.
+  //if the sensor reads less than the white value it's white.
   if (IRValL <= whiteValL)  {
     colourL = "white";
-    //if the sensor read more than 80 and less than 250 it's grey.
+    //if the sensor read more than the white value and less than the grey value it's grey.
   } else if (IRValL > whiteValL && IRValL <= greyValL) {
     colourL = "grey";
-    //if the sensor reads more than 250 then it's black.
+    //if the sensor reads more than the grey value then it's black.
   } else if (IRValL > greyValL)  {
     colourL = "black";
   }
@@ -80,7 +84,7 @@ void mazeLoop() {
   display.println(IRValL);
   display.display();
 
-  //this works for following the line of the maze.
+
   //If both are white then drive forward
   if (colourL == "white" && colourR == "white")
   {
