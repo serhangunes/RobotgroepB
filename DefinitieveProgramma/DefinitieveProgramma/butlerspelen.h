@@ -16,12 +16,13 @@ void lookForHole() {
   
   //Turn a bit to the left, then start turning right.
   //When the sensor gets above a certain threshold, move forwards.
-  turnLeft(60);
+  turnLeft(70);
   delay(400);
 
   do {
     dist = measure();
-    turnRight(60);
+    turnRight(70);
+    delay(50);
   } while (dist < valCap);
   standStill();
 
