@@ -14,8 +14,8 @@ WebSocketsClient webSocket; //websocket variable
 
 const char* ssid = "Hotspot van Yannieck"; //network name
 const char* password = "vmzm9931"; //network password
-const char* ipadress = "battlebot1.serverict.nl"; //server ip-adress
-const int port = 33003; //websocket port
+const char* ipadress = "battlebot.oohnoo.nl"; //server ip-adress
+const int port = 3003; //websocket port
 
 const String games[3] = {"butler", "maze", "race"}; //the 3 games
 

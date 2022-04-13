@@ -7,12 +7,12 @@
 #include <Adafruit_VL53L0X.h> //liDAR library
 #include <Adafruit_GFX.h> //graphics library
 #include <Adafruit_SSD1306.h> //display library
+int amount = 0;
 
 Adafruit_VL53L0X lidar = Adafruit_VL53L0X(); //LiDAR variable
 
 //declaring the screen.
 Adafruit_SSD1306 display(128, 64, &Wire, 4);
-
 
 int IRPinR = 34; //right IR sensor
 int IRPinL = 39; //left IR sensor
@@ -31,10 +31,12 @@ float motorL = 255.0f;
 String colourR = "";
 String colourL = "";
 
-int whiteValL = 80;
+int whiteValL = 85;
 int whiteValR = 80;
-int greyValL = 200;
-int greyValR = 200;
+int greyValL = 250;
+int greyValR = 250;
+int blackValL = 800;
+int blackValR = 800;
 
 void setup() {
 //setup display
@@ -81,7 +83,7 @@ void readPins() {
   }else if(IRValR > whiteValR && IRValR <=greyValR)  {
     colourR = "grey";
 //if the sensor reads more than 250 then it's black.
-  }else if(IRValR > greyValR) {
+  }else if(IRValR > blackValR) {
     colourR = "black";
   }
 
@@ -92,7 +94,7 @@ void readPins() {
   }else if(IRValL >whiteValL && IRValL <=greyValL) {
     colourL = "grey";
 //if the sensor reads more than 250 then it's black.
-  }else if(IRValL >greyValL)  {
+  }else if(IRValL >blackValL)  {
     colourL = "black";
   }
 }
@@ -185,7 +187,7 @@ void turn180Maze(double percentage)  {
   analogWrite(motorPinRV, 0);
   analogWrite(motorPinLV, speedL);
   analogWrite(motorPinLA, 0);
-  delay(600);
+  delay(1500);
 }
 
 /*
@@ -205,12 +207,12 @@ void turn90Backwards(double percentage)  {
  *  turn left 90
  */
 void turnRight90Maze() {
-    driveForward(80);
-    delay(200);
+    driveForward(75);
+    delay(125);
     standStill();
     delay(500);
-    turnRightMaze(80);
-    delay(600);
+    turnRightMaze(75);
+    delay(800);
     standStill();
     delay(1000);
 }
@@ -220,12 +222,12 @@ void turnRight90Maze() {
  *  turn right 90
  */
 void turnLeft90Maze() {
-    driveForward(80);
-    delay(250);
+    driveForward(75);
+    delay(100);
     standStill();
     delay(500);
-    turnLeftMaze(80);
-    delay(650);
+    turnLeftMaze(77);
+    delay(950);
     standStill();
     delay(1000);
 }
@@ -252,42 +254,53 @@ void mazeLoop() {
 //If both are white then drive forward
   if(colourL == "white" && colourR == "white")  
   {
-    driveForward(80);
+    driveForward(75);
+    amount = 0;
   }
 //if left is grey then adjust to the left.
   else if(colourL == "grey" && colourR == "white") 
   {
-    turnLeftMaze(80);
+    turnLeftMaze(75);
+    amount = 0;
   }
 //if right is grey then adjust to the right.
   else if(colourL == "white" && colourR == "grey") 
   {
-    turnRightMaze(80);
+    turnRightMaze(75);
+    amount = 0;
   }
 //if right is black then turn 90 degrees to the right.
   else if(colourL == "white" && colourR == "black")
   {
     turnRight90Maze();
+    amount = 0;
   }
 //if right is black then turn 90 degrees to the right.
   else if(colourL == "grey" && colourR == "black")
   {
     turnRight90Maze();
+    amount = 0;
   }
 //if both are grey then turn 180 degrees.
   else if(colourL == "grey" && colourR == "grey")  
   {
     standStill();
+    amount = amount + 1;
+    if(amount == 10){
+      turn180Maze(75);
+    }
   }
 //if left is black then turn 90 degrees to the right.
   else if(colourL == "black" && colourR == "white")
   {
     turnLeft90Maze();
+    amount = 0;
   }
 //if left is black then turn 90 degrees to the right.
   else if(colourL == "black" && colourR == "grey")
   {
-    turnLeft90Maze();   
+    turnLeft90Maze(); 
+    amount = 0;  
   }
   else if(colourL == "black" && colourR == "black") {
     turnRight90Maze();
@@ -296,5 +309,6 @@ void mazeLoop() {
   else
   {
     standStill();
+    amount = 0;
   }
 }
