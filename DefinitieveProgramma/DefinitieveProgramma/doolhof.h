@@ -5,7 +5,7 @@ String colourL = "";
 //Declaring the colours
 
 int whiteValL = 85;
-int whiteValR = 80;
+int whiteValR = 75;
 int greyValL = 250;
 int greyValR = 250;
 int blackValL = 800;

@@ -12,8 +12,8 @@ Adafruit_SSD1306 display(128, 32, &Wire, 4); //display variable
 Adafruit_VL53L0X lidar = Adafruit_VL53L0X(); //LiDAR variable
 WebSocketsClient webSocket; //websocket variable
 
-const char* ssid = "Hotspot van Yannieck"; //network name
-const char* password = "vmzm9931"; //network password
+const char* ssid = "Wifi is saai"; //network name
+const char* password = "2much4u2day"; //network password
 const char* ipadress = "battlebot.oohnoo.nl"; //server ip-adress
 const int port = 3003; //websocket port
 
