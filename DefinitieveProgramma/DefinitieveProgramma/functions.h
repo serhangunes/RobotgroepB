@@ -94,7 +94,7 @@ void turn180Maze(double percentage)  {
   analogWrite(motorPinRV, 0);
   analogWrite(motorPinLV, speedL);
   analogWrite(motorPinLA, 0);
-  delay(600);
+  delay(1500);
 }
 
 /*
@@ -114,12 +114,12 @@ void turn90Backwards(double percentage)  {
     turn left 90
 */
 void turnRight90Maze() {
-  driveForward(70);
-  delay(200);
+  driveForward(75);
+  delay(125);
   standStill();
   delay(500);
-  turnRightMaze(80);
-  delay(600);
+  turnRightMaze(75);
+  delay(800);
   standStill();
   delay(1000);
 }
@@ -129,12 +129,12 @@ void turnRight90Maze() {
     turn right 90
 */
 void turnLeft90Maze() {
-  driveForward(70);
-  delay(250);
+  driveForward(75);
+  delay(100);
   standStill();
   delay(500);
-  turnLeftMaze(80);
-  delay(650);
+  turnLeftMaze(77);
+  delay(950);
   standStill();
   delay(1000);
 }
